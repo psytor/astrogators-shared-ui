@@ -1,6 +1,6 @@
 {
   "name": "@psytor/astrogators-shared-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared UI components and utilities for Astrogator's Table applications",
   "type": "module",
   "main": "./dist/index.js",

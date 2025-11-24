@@ -22,7 +22,7 @@ export interface LoginResponse {
   access_token: string;
   refresh_token: string;
   token_type: string;
-  user: User;
+  expires_in: number;
 }
 
 export interface RegisterRequest {
@@ -33,11 +33,8 @@ export interface RegisterRequest {
 
 export interface RegisterResponse {
   message: string;
-  user: {
-    id: string;
-    email: string;
-    username: string;
-  };
+  email: string;
+  verification_required: boolean;
 }
 
 export interface RefreshTokenRequest {

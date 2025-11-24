@@ -56,7 +56,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await apiClient.post<LoginResponse>('/api/v1/auth/login', credentials);
       setTokens(response.access_token, response.refresh_token);
-      setUser(response.user);
+      // Fetch user data after setting tokens
+      const userData = await apiClient.get<User>('/api/v1/users/me');
+      setUser(userData);
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
