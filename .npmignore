@@ -1,0 +1,33 @@
+# Source files (only ship dist/)
+src/
+public/
+
+# Config files
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+
+# Git
+.git
+.gitignore
+
+# CI/CD
+.github/
+
+# Editor
+.vscode/
+.idea/
+
+# Documentation (except README)
+docs/
+
+# Tests
+tests/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Misc
+.DS_Store
+*.log

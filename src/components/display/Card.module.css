@@ -1,0 +1,58 @@
+.card {
+  background-color: var(--card-background);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+/* Variants */
+.default {
+  background-color: var(--card-background);
+}
+
+.elevated {
+  background-color: var(--card-background);
+  box-shadow: var(--shadow-md);
+}
+
+.outline {
+  background-color: transparent;
+  border: 1px solid var(--card-border);
+}
+
+/* Padding */
+.padding-none {
+  padding: 0;
+}
+
+.padding-sm {
+  padding: var(--spacing-sm);
+}
+
+.padding-md {
+  padding: var(--card-padding);
+}
+
+.padding-lg {
+  padding: var(--spacing-xl);
+}
+
+/* Hoverable */
+.hoverable {
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hoverable:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+/* Focus styles for accessibility */
+.card[role='button']:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

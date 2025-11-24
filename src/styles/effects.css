@@ -1,0 +1,197 @@
+/**
+ * Reusable CSS Effects
+ * Complex effects like chamfered boxes, gradients, etc.
+ */
+
+/* ========== CHAMFERED BOXES ========== */
+
+/**
+ * Chamfered Box - Standard
+ * Creates a box with cut corners (sci-fi aesthetic)
+ * Usage: Add class "chamfered-box" to any element
+ */
+.chamfered-box {
+  position: relative;
+  clip-path: polygon(
+    var(--chamfer-size) 0,
+    calc(100% - var(--chamfer-size)) 0,
+    100% var(--chamfer-size),
+    100% calc(100% - var(--chamfer-size)),
+    calc(100% - var(--chamfer-size)) 100%,
+    var(--chamfer-size) 100%,
+    0 calc(100% - var(--chamfer-size)),
+    0 var(--chamfer-size)
+  );
+}
+
+/**
+ * Chamfered Box - Large
+ * Larger cut corners for emphasis
+ */
+.chamfered-box-lg {
+  position: relative;
+  clip-path: polygon(
+    var(--chamfer-size-lg) 0,
+    calc(100% - var(--chamfer-size-lg)) 0,
+    100% var(--chamfer-size-lg),
+    100% calc(100% - var(--chamfer-size-lg)),
+    calc(100% - var(--chamfer-size-lg)) 100%,
+    var(--chamfer-size-lg) 100%,
+    0 calc(100% - var(--chamfer-size-lg)),
+    0 var(--chamfer-size-lg)
+  );
+}
+
+/**
+ * Chamfered Box - Small
+ * Subtle cut corners
+ */
+.chamfered-box-sm {
+  position: relative;
+  clip-path: polygon(
+    var(--chamfer-size-sm) 0,
+    calc(100% - var(--chamfer-size-sm)) 0,
+    100% var(--chamfer-size-sm),
+    100% calc(100% - var(--chamfer-size-sm)),
+    calc(100% - var(--chamfer-size-sm)) 100%,
+    var(--chamfer-size-sm) 100%,
+    0 calc(100% - var(--chamfer-size-sm)),
+    0 var(--chamfer-size-sm)
+  );
+}
+
+/**
+ * Chamfered Border
+ * Creates a border with cut corners using pseudo-element
+ */
+.chamfered-border {
+  position: relative;
+  background: var(--color-surface);
+}
+
+.chamfered-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  clip-path: polygon(
+    var(--chamfer-size) 0,
+    calc(100% - var(--chamfer-size)) 0,
+    100% var(--chamfer-size),
+    100% calc(100% - var(--chamfer-size)),
+    calc(100% - var(--chamfer-size)) 100%,
+    var(--chamfer-size) 100%,
+    0 calc(100% - var(--chamfer-size)),
+    0 var(--chamfer-size)
+  );
+}
+
+/* ========== GRADIENTS ========== */
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-active));
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-active));
+}
+
+.gradient-surface {
+  background: linear-gradient(135deg, var(--color-surface), var(--color-background-elevated));
+}
+
+/* ========== GLOW EFFECTS ========== */
+
+.glow-primary {
+  box-shadow: 0 0 20px rgba(26, 115, 232, 0.5);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px rgba(52, 168, 83, 0.5);
+}
+
+.glow-error {
+  box-shadow: 0 0 20px rgba(234, 67, 53, 0.5);
+}
+
+/* ========== HOVER EFFECTS ========== */
+
+.hover-lift {
+  transition: transform var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-glow {
+  transition: box-shadow var(--transition-base);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(26, 115, 232, 0.4);
+}
+
+/* ========== ANIMATIONS ========== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-base);
+}
+
+.animate-slide-up {
+  animation: slideUp var(--transition-base);
+}
+
+.animate-slide-down {
+  animation: slideDown var(--transition-base);
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

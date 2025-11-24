@@ -1,0 +1,101 @@
+/* Spinner */
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner.sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.spinner.md {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+.spinner.lg {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dots */
+.dots {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.dots.sm {
+  gap: 4px;
+}
+
+.dots.lg {
+  gap: 12px;
+}
+
+.dot {
+  display: inline-block;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dots.sm .dot {
+  width: 6px;
+  height: 6px;
+}
+
+.dots.md .dot {
+  width: 10px;
+  height: 10px;
+}
+
+.dots.lg .dot {
+  width: 14px;
+  height: 14px;
+}
+
+.dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Accessibility */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
