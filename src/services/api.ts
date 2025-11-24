@@ -101,7 +101,20 @@ export class ApiClient {
 
       try {
         const errorData = await response.json();
-        error.message = errorData.message || errorData.detail || error.message;
+
+        // Handle FastAPI validation errors (422)
+        if (response.status === 422 && Array.isArray(errorData.detail)) {
+          // Extract validation error messages
+          const validationErrors = errorData.detail
+            .map((err: any) => err.msg || 'Validation error')
+            .join(', ');
+          error.message = validationErrors;
+        } else if (typeof errorData.detail === 'string') {
+          error.message = errorData.detail;
+        } else if (errorData.message) {
+          error.message = errorData.message;
+        }
+
         error.detail = errorData.detail;
       } catch {
         // Response is not JSON
