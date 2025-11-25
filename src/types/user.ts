@@ -57,7 +57,8 @@ export interface ForgotPasswordResponse {
 
 export interface ResetPasswordRequest {
   token: string;
-  new_password: string;
+  password: string;
+  password_confirm: string;
 }
 
 export interface ResetPasswordResponse {
@@ -69,5 +70,13 @@ export interface VerifyEmailRequest {
 }
 
 export interface VerifyEmailResponse {
+  message: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+export interface ResendVerificationResponse {
   message: string;
 }

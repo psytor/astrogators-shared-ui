@@ -1,5 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { User, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../types';
+import {
+  User,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
+} from '../types';
 import { setTokens, clearTokens, isAuthenticated as checkAuth } from '../services/auth';
 import { apiClient } from '../services/api';
 
@@ -11,6 +23,9 @@ export interface AuthContextValue {
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  forgotPassword: (data: ForgotPasswordRequest) => Promise<string>;
+  resetPassword: (data: ResetPasswordRequest) => Promise<string>;
+  resendVerification: (data: ResendVerificationRequest) => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -84,6 +99,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     await fetchUser();
   };
 
+  const forgotPassword = async (data: ForgotPasswordRequest): Promise<string> => {
+    try {
+      const response = await apiClient.post<ForgotPasswordResponse>(
+        '/api/v1/auth/forgot-password',
+        data
+      );
+      return response.message;
+    } catch (error) {
+      console.error('Forgot password failed:', error);
+      throw error;
+    }
+  };
+
+  const resetPassword = async (data: ResetPasswordRequest): Promise<string> => {
+    try {
+      const response = await apiClient.post<ResetPasswordResponse>(
+        '/api/v1/auth/reset-password',
+        data
+      );
+      return response.message;
+    } catch (error) {
+      console.error('Reset password failed:', error);
+      throw error;
+    }
+  };
+
+  const resendVerification = async (data: ResendVerificationRequest): Promise<string> => {
+    try {
+      const response = await apiClient.post<ResendVerificationResponse>(
+        '/api/v1/auth/resend-verification',
+        data
+      );
+      return response.message;
+    } catch (error) {
+      console.error('Resend verification failed:', error);
+      throw error;
+    }
+  };
+
   const value: AuthContextValue = {
     user,
     isAuthenticated: !!user,
@@ -92,6 +146,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     refreshUser,
+    forgotPassword,
+    resetPassword,
+    resendVerification,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
