@@ -1,7 +1,7 @@
 .card {
   background-color: var(--card-background);
   border-radius: var(--radius-lg);
-  transition: all var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 /* Variants */
@@ -39,15 +39,18 @@
 /* Hoverable */
 .hoverable {
   cursor: pointer;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .hoverable:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px) translateZ(0);
   box-shadow: var(--shadow-lg);
 }
 
 .hoverable:active {
-  transform: translateY(0);
+  transform: translateY(-1px) translateZ(0);
   box-shadow: var(--shadow-md);
 }
 
