@@ -12,6 +12,8 @@ export type {
   ResetPasswordResponse,
   VerifyEmailRequest,
   VerifyEmailResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
 } from './user';
 
 export type { ApiResponse, ApiError, PaginatedResponse } from './api';
