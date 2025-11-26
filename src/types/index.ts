@@ -14,6 +14,10 @@ export type {
   VerifyEmailResponse,
   ResendVerificationRequest,
   ResendVerificationResponse,
+  AllyCode,
+  AllyCodeCreate,
+  AllyCodeListResponse,
+  AllyCodeMigrationPrompt,
 } from './user';
 
 export type { ApiResponse, ApiError, PaginatedResponse } from './api';

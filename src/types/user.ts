@@ -80,3 +80,25 @@ export interface ResendVerificationRequest {
 export interface ResendVerificationResponse {
   message: string;
 }
+
+export interface AllyCode {
+  id: number;
+  ally_code: string;
+  player_name: string | null;
+  last_used_at: string | null;
+  created_at: string;
+}
+
+export interface AllyCodeCreate {
+  ally_code: string;
+}
+
+export interface AllyCodeListResponse {
+  ally_codes: AllyCode[];
+  total: number;
+}
+
+export interface AllyCodeMigrationPrompt {
+  show: boolean;
+  localStorageCodes: string[];
+}

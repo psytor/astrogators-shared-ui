@@ -1,0 +1,64 @@
+.allyCodeDropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.select {
+  min-width: 200px;
+}
+
+.manageButton {
+  white-space: nowrap;
+}
+
+.managePanel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 0.5rem;
+  min-width: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.managePanel h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.codeItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.codeItem:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0.5rem;
+}
+
+.codeItem span {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .select {
+    min-width: 150px;
+  }
+
+  .managePanel {
+    right: auto;
+    left: 0;
+  }
+}

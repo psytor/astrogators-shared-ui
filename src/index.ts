@@ -11,8 +11,8 @@ export { Container, TopBar, Footer } from './components/layout';
 export type { ContainerProps, TopBarProps, FooterProps } from './components/layout';
 
 // Form Components
-export { Button, Input, Select } from './components/forms';
-export type { ButtonProps, InputProps, SelectProps, SelectOption } from './components/forms';
+export { Button, Input, Select, AllyCodeDropdown } from './components/forms';
+export type { ButtonProps, InputProps, SelectProps, SelectOption, AllyCodeDropdownProps } from './components/forms';
 
 // Display Components
 export { Card, Badge, Modal } from './components/display';
@@ -42,6 +42,17 @@ export {
   isAuthenticated,
 } from './services/auth';
 
+export {
+  getAllyCodesFromStorage,
+  saveAllyCodeToStorage,
+  removeAllyCodeFromStorage,
+  updateAllyCodeLastUsed,
+  getSelectedAllyCode,
+  setSelectedAllyCode,
+  clearAllyCodes,
+} from './services/allyCodeStorage';
+export type { StoredAllyCode } from './services/allyCodeStorage';
+
 // Types
 export type {
   User,
@@ -57,6 +68,12 @@ export type {
   ResetPasswordResponse,
   VerifyEmailRequest,
   VerifyEmailResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
+  AllyCode,
+  AllyCodeCreate,
+  AllyCodeListResponse,
+  AllyCodeMigrationPrompt,
   ApiResponse,
   ApiError,
   PaginatedResponse,
