@@ -3,6 +3,7 @@ import { Select, SelectOption } from './Select';
 import { Button } from './Button';
 import { Input } from './Input';
 import { useAuth } from '../../contexts/AuthContext';
+import { formatAllyCode } from '../../utils/formatAllyCode';
 import styles from './AllyCodeDropdown.module.css';
 
 export interface AllyCodeDropdownProps {
@@ -38,8 +39,8 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
   const options: SelectOption[] = allyCodes.map(code => ({
     value: code.ally_code,
     label: code.player_name
-      ? `${code.player_name} (${code.ally_code})`
-      : code.ally_code,
+      ? `${code.player_name} (${formatAllyCode(code.ally_code)})`
+      : formatAllyCode(code.ally_code),
   }));
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -127,7 +128,7 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
             {allyCodes.map(code => (
               <div key={code.ally_code} className={styles.codeItem}>
                 <span>
-                  {code.player_name || code.ally_code}
+                  {code.player_name ? `${code.player_name} (${formatAllyCode(code.ally_code)})` : formatAllyCode(code.ally_code)}
                 </span>
                 <Button
                   variant="ghost"

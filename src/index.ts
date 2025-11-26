@@ -53,6 +53,9 @@ export {
 } from './services/allyCodeStorage';
 export type { StoredAllyCode } from './services/allyCodeStorage';
 
+// Utils
+export { formatAllyCode, unformatAllyCode } from './utils/formatAllyCode';
+
 // Types
 export type {
   User,
