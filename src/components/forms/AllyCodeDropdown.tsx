@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Select, SelectOption } from './Select';
 import { Button } from './Button';
+import { Input } from './Input';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './AllyCodeDropdown.module.css';
 
@@ -23,10 +24,15 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
     selectedAllyCode,
     selectAllyCode,
     removeAllyCode,
+    addAllyCode,
     isLoadingAllyCodes,
   } = useAuth();
 
   const [showManage, setShowManage] = useState(false);
+  const [newAllyCode, setNewAllyCode] = useState('');
+  const [addError, setAddError] = useState('');
+  const [addSuccess, setAddSuccess] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
 
   // Convert ally codes to select options
   const options: SelectOption[] = allyCodes.map(code => ({
@@ -50,6 +56,29 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
     }
   };
 
+  const handleAdd = async () => {
+    setAddError('');
+    setAddSuccess('');
+
+    if (!/^\d{9}$/.test(newAllyCode)) {
+      setAddError('Ally code must be exactly 9 digits');
+      return;
+    }
+
+    setIsAdding(true);
+
+    try {
+      await addAllyCode(newAllyCode);
+      setAddSuccess('Added successfully!');
+      setNewAllyCode('');
+      setTimeout(() => setAddSuccess(''), 2000);
+    } catch (err: any) {
+      setAddError(err.message || 'Failed to add ally code');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   if (allyCodes.length === 0) {
     return null; // Don't show dropdown if no codes saved
   }
@@ -68,24 +97,54 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
       {showManage && (
         <div className={styles.managePanel}>
           <h4>Manage Ally Codes</h4>
-          {allyCodes.map(code => (
-            <div key={code.ally_code} className={styles.codeItem}>
-              <span>
-                {code.player_name || code.ally_code}
-              </span>
+
+          {/* Add new ally code */}
+          <div className={styles.addSection}>
+            <div className={styles.addInputGroup}>
+              <Input
+                type="text"
+                placeholder="9-digit ally code"
+                value={newAllyCode}
+                onChange={(e) => setNewAllyCode(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                disabled={isAdding}
+              />
               <Button
-                variant="ghost"
+                variant="primary"
                 size="sm"
-                onClick={() => handleRemove(code.ally_code)}
+                onClick={handleAdd}
+                loading={isAdding}
+                disabled={newAllyCode.length !== 9}
               >
-                Remove
+                Add
               </Button>
             </div>
-          ))}
+            {addError && <div className={styles.error}>{addError}</div>}
+            {addSuccess && <div className={styles.success}>{addSuccess}</div>}
+          </div>
+
+          {/* Existing ally codes */}
+          <div className={styles.codesList}>
+            {allyCodes.map(code => (
+              <div key={code.ally_code} className={styles.codeItem}>
+                <span>
+                  {code.player_name || code.ally_code}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemove(code.ally_code)}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+
           <Button
             variant="secondary"
             size="sm"
             onClick={() => setShowManage(false)}
+            className={styles.doneButton}
           >
             Done
           </Button>
