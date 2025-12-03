@@ -11,7 +11,7 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
   label?: string;
   error?: string;
   helperText?: string;
-  options: SelectOption[];
+  options?: SelectOption[];
   placeholder?: string;
   fullWidth?: boolean;
   className?: string;
@@ -59,7 +59,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                 {placeholder}
               </option>
             )}
-            {options.map((option) => (
+            {options && options.map((option) => (
               <option
                 key={option.value}
                 value={option.value}
@@ -68,6 +68,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                 {option.label}
               </option>
             ))}
+            {!options && props.children}
           </select>
           <span className={styles.arrow}>▼</span>
         </div>

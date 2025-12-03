@@ -1,5 +1,5 @@
 /**
- * Main export file for @psytor/astrogators-shared-ui
+ * Main export file for astrogators-shared-ui
  * Shared UI components and utilities for Astrogator's Table applications
  */
 
