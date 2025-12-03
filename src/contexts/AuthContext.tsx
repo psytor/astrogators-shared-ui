@@ -16,7 +16,7 @@ import {
   AllyCodeMigrationPrompt,
 } from '../types';
 import { setTokens, clearTokens, isAuthenticated as checkAuth } from '../services/auth';
-import { apiClient } from '../services/api';
+import { apiClient, initializeApiClient } from '../services/api';
 import {
   getAllyCodesFromStorage,
   saveAllyCodeToStorage,
@@ -58,13 +58,14 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export interface AuthProviderProps {
   children: React.ReactNode;
+  apiBaseUrl: string;
 }
 
 /**
  * AuthProvider
  * Provides authentication state and methods to the entire application
  */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -76,6 +77,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     show: false,
     localStorageCodes: [],
   });
+
+  // Initialize API client with provided base URL
+  useEffect(() => {
+    initializeApiClient({
+      baseURL: apiBaseUrl,
+    });
+  }, [apiBaseUrl]);
 
   // Fetch current user from API
   const fetchUser = useCallback(async () => {
