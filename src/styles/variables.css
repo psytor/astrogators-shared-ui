@@ -34,6 +34,24 @@
   --color-error: #ea4335;
   --color-info: #4285f4;
 
+  /* ========== MOD TIER COLORS ========== */
+  --tier-grey: #C0EEEE;
+  --tier-green: #47c43c;
+  --tier-blue: #1D99FF;
+  --tier-purple: #8b5cf6;
+  --tier-gold: #ffcc33;
+
+  /* Tier glow effects */
+  --tier-gold-glow: rgba(255, 204, 51, 0.6);
+  --tier-purple-glow: rgba(139, 92, 246, 0.5);
+  --tier-blue-glow: rgba(29, 153, 255, 0.5);
+
+  /* ========== 6-DOT MOD EFFECTS ========== */
+  --sixdot-gradient-start: #60a5fa;
+  --sixdot-gradient-mid: #a855f7;
+  --sixdot-gradient-end: #f59e0b;
+  --sixdot-border-opacity: 0.3;
+
   /* ========== TYPOGRAPHY ========== */
 
   /* Font Families */

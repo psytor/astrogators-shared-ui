@@ -167,3 +167,30 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+/* ========== BACKGROUND & OVERLAY UTILITIES ========== */
+
+.bg-overlay {
+  position: relative;
+}
+
+.bg-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-gradient, linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.5)));
+  z-index: 0;
+}
+
+.bg-overlay > * {
+  position: relative;
+  z-index: 1;
+}
+
+.backdrop-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

@@ -120,7 +120,71 @@
   box-shadow: 0 0 20px rgba(234, 67, 53, 0.5);
 }
 
+/* ========== TIER-BASED GLOWS ========== */
+
+.glow-tier-gold {
+  box-shadow: 0 0 20px var(--tier-gold-glow);
+}
+
+.glow-tier-purple {
+  box-shadow: 0 0 20px var(--tier-purple-glow);
+}
+
+.glow-tier-blue {
+  box-shadow: 0 0 20px var(--tier-blue-glow);
+}
+
+/* ========== 6-DOT SPECIAL EFFECTS ========== */
+
+.sixdot-border {
+  position: relative;
+}
+
+.sixdot-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--sixdot-gradient-start),
+    var(--sixdot-gradient-mid),
+    var(--sixdot-gradient-end)
+  );
+  border-radius: inherit;
+  opacity: var(--sixdot-border-opacity);
+  z-index: -1;
+}
+
+.sixdot-glow {
+  background: linear-gradient(
+    135deg,
+    rgba(67, 56, 202, 0.2),
+    rgba(124, 58, 237, 0.2)
+  );
+}
+
 /* ========== HOVER EFFECTS ========== */
+
+.hover-scale {
+  transition: transform var(--transition-base);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-brighten {
+  transition: filter var(--transition-base);
+}
+
+.hover-brighten:hover {
+  filter: brightness(1.1);
+}
+
+/* Existing hover effects */
 
 .hover-lift {
   transition: transform var(--transition-base);
