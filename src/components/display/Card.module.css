@@ -4,6 +4,11 @@
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
+/* Remove border-radius when chamfered (clip-path handles corners) */
+.card.chamfered {
+  border-radius: 0;
+}
+
 /* Variants */
 .default {
   background-color: var(--card-background);

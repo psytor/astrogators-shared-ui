@@ -61,6 +61,25 @@
 }
 
 /**
+ * Chamfered Box - Asymmetric (Signature Design)
+ * 3 corners at 12px, bottom-right corner at 24px
+ * Creates a distinctive, bold aesthetic
+ */
+.chamfered-box-asymmetric {
+  position: relative;
+  clip-path: polygon(
+    12px 0%,
+    calc(100% - 12px) 0%,
+    100% 12px,
+    100% calc(100% - 24px),
+    calc(100% - 24px) 100%,
+    12px 100%,
+    0% calc(100% - 12px),
+    0% 12px
+  );
+}
+
+/**
  * Chamfered Border
  * Creates a border with cut corners using pseudo-element
  */
@@ -90,6 +109,71 @@
     0 calc(100% - var(--chamfer-size)),
     0 var(--chamfer-size)
   );
+}
+
+/* ========== DIAGONAL CORNER BORDERS ========== */
+
+/**
+ * Diagonal Corner Borders for Chamfered Boxes
+ * Creates visible lines on the cut corners
+ * Usage: Add .chamfered-diagonal-borders and include corner div elements
+ */
+.chamfered-diagonal-border {
+  position: absolute;
+  background-color: currentColor;
+  transition: background-color 0.3s ease;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Top-left corner diagonal */
+.chamfered-diagonal-tl {
+  top: -1px;
+  left: 11px;
+  width: 16px;
+  height: 2px;
+  transform: rotate(135deg);
+  transform-origin: left center;
+}
+
+/* Top-right corner diagonal */
+.chamfered-diagonal-tr {
+  top: 10px;
+  right: 0px;
+  width: 18px;
+  height: 2px;
+  transform: rotate(45deg);
+  transform-origin: right center;
+}
+
+/* Bottom-left corner diagonal */
+.chamfered-diagonal-bl {
+  bottom: -2px;
+  left: 12px;
+  width: 20px;
+  height: 2px;
+  transform: rotate(-135deg);
+  transform-origin: left center;
+}
+
+/* Bottom-right corner diagonal (standard 12px chamfer) */
+.chamfered-diagonal-br {
+  bottom: 11px;
+  right: -1px;
+  width: 18px;
+  height: 2px;
+  transform: rotate(-45deg);
+  transform-origin: right center;
+}
+
+/* Bottom-right corner diagonal (asymmetric 24px chamfer) */
+.chamfered-diagonal-br-large {
+  bottom: 23px;
+  right: -1px;
+  width: 35px;
+  height: 2px;
+  transform: rotate(-45deg);
+  transform-origin: right center;
 }
 
 /* ========== GRADIENTS ========== */
