@@ -1,9 +1,11 @@
 import React from 'react';
+import { ReactNode, CSSProperties } from 'react';
 import styles from './Container.module.css';
 
 export interface ContainerProps {
-  children: React.ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  children: ReactNode;
+  maxWidth?: string;
+  style?: CSSProperties;
   padding?: boolean;
   className?: string;
 }
