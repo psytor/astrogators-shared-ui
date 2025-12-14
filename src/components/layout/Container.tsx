@@ -1,13 +1,12 @@
-import React from 'react';
-import { ReactNode, CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import styles from './Container.module.css';
 
 export interface ContainerProps {
-  children: ReactNode;
-  maxWidth?: string;
-  style?: CSSProperties;
+  children: React.ReactNode;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   padding?: boolean;
   className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -19,12 +18,14 @@ export const Container: React.FC<ContainerProps> = ({
   maxWidth = 'xl',
   padding = true,
   className = '',
+  style,
 }) => {
   return (
     <div
       className={`${styles.container} ${styles[`maxWidth-${maxWidth}`]} ${
         padding ? styles.padding : ''
       } ${className}`}
+      style={style}
     >
       {children}
     </div>
