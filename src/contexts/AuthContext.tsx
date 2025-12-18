@@ -40,6 +40,10 @@ export interface AuthContextValue {
   resetPassword: (data: ResetPasswordRequest) => Promise<string>;
   resendVerification: (data: ResendVerificationRequest) => Promise<string>;
 
+  // Feature flags
+  authEnabled: boolean;
+  isLoadingFeatures: boolean;
+
   // Ally code management
   allyCodes: AllyCode[] | StoredAllyCode[];
   selectedAllyCode: string | null;
@@ -69,6 +73,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Feature flags state
+  const [authEnabled, setAuthEnabled] = useState(true); // Default to enabled
+  const [isLoadingFeatures, setIsLoadingFeatures] = useState(true);
+
   // Ally code state
   const [allyCodes, setAllyCodes] = useState<AllyCode[] | StoredAllyCode[]>([]);
   const [selectedAllyCode, setSelectedAllyCodeState] = useState<string | null>(null);
@@ -83,6 +91,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
     initializeApiClient({
       baseURL: apiBaseUrl,
     });
+  }, [apiBaseUrl]);
+
+  // Fetch feature flags from API
+  useEffect(() => {
+    const fetchFeatures = async () => {
+      try {
+        const features = await apiClient.get<{ auth_enabled: boolean }>('/api/v1/config/features');
+        setAuthEnabled(features.auth_enabled);
+      } catch (error) {
+        console.error('Failed to fetch features:', error);
+        // Default to enabled on error to avoid breaking existing functionality
+        setAuthEnabled(true);
+      } finally {
+        setIsLoadingFeatures(false);
+      }
+    };
+
+    fetchFeatures();
   }, [apiBaseUrl]);
 
   // Fetch current user from API
@@ -351,6 +377,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
     forgotPassword,
     resetPassword,
     resendVerification,
+
+    // Feature flags
+    authEnabled,
+    isLoadingFeatures,
 
     // Ally code values
     allyCodes,
