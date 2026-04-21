@@ -8,7 +8,6 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
-      insertTypesEntry: true,
       include: ['src'],
     }),
   ],
@@ -26,10 +25,7 @@ export default defineConfig({
           react: 'React',
           'react-dom': 'ReactDOM',
         },
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'style.css') return 'style.css';
-          return assetInfo.name || '';
-        },
+        assetFileNames: (assetInfo) => assetInfo.name || '',
       },
     },
     cssCodeSplit: false,
