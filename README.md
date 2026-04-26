@@ -1,169 +1,116 @@
 # @psytor/astrogators-shared-ui
 
-Shared UI components and utilities for Astrogator's Table applications.
+Shared React components, auth, and API client for the Astrogator's Table
+frontends (`astrogators-hub`, `mod-ledger-ui`). Published to GitHub Packages.
+
+This is a library — there is no app shell here. See `PUBLISHING.md` for the
+release flow and `CLAUDE.md` for architecture notes.
 
 ## Installation
+
+The package is hosted on GitHub Packages, so consumers need an `.npmrc`
+pointing the `@psytor` scope at the right registry:
+
+```
+@psytor:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_PAT}
+```
+
+The PAT needs `read:packages` scope. Then:
 
 ```bash
 npm install @psytor/astrogators-shared-ui
 ```
 
+Peer dependencies: `react` and `react-dom` (18 or 19).
+
 ## Setup
 
-### 1. Initialize API Client
+### 1. Wrap the app in `AuthProvider`
 
-In your application's entry point (e.g., `main.tsx` or `App.tsx`):
-
-```tsx
-import { initializeApiClient } from '@psytor/astrogators-shared-ui';
-
-initializeApiClient({
-  baseURL: 'http://localhost:8000', // Your backend API URL
-  onUnauthorized: () => {
-    // Handle unauthorized (e.g., redirect to login)
-    window.location.href = '/login';
-  },
-});
-```
-
-### 2. Wrap Application with AuthProvider
+`AuthProvider` initializes the API client with the given `apiBaseUrl` and
+manages auth, feature flags, and ally codes for the whole app. Pass the
+**prefixed** backend URL — workspace backends mount their routes under
+`/<service-name>` (see the workspace `CLAUDE.md`).
 
 ```tsx
 import { AuthProvider } from '@psytor/astrogators-shared-ui';
+import '@psytor/astrogators-shared-ui/styles';
 
 function App() {
   return (
-    <AuthProvider>
-      {/* Your app content */}
+    <AuthProvider apiBaseUrl={import.meta.env.VITE_API_BASE_URL}>
+      {/* your app */}
     </AuthProvider>
   );
 }
 ```
 
-### 3. Import Global Styles
+`VITE_API_BASE_URL` looks like `http://localhost:8000/astrogators-table` in
+dev.
+
+### 2. (Optional) Reconfigure the API client
+
+`AuthProvider` already calls `initializeApiClient`. Call it yourself only if
+you need a custom `onUnauthorized` handler (e.g. router-driven redirects):
 
 ```tsx
-import '@psytor/astrogators-shared-ui/styles';
+import { initializeApiClient } from '@psytor/astrogators-shared-ui';
+
+initializeApiClient({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  onUnauthorized: () => navigate('/login'),
+});
 ```
 
 ## Components
 
-### Layout Components
+All components are styled via CSS Modules and the global design tokens in
+`./styles`. Override the design system by redefining CSS variables on `:root`
+(see "Theming").
 
-#### TopBar
-
-```tsx
-import { TopBar } from '@psytor/astrogators-shared-ui';
-
-<TopBar
-  logo={<div>Astrogator's Table</div>}
-  rightContent={<button>Login</button>}
-/>
-```
-
-#### Container
+### Layout
 
 ```tsx
-import { Container } from '@psytor/astrogators-shared-ui';
+import { TopBar, Container, Footer } from '@psytor/astrogators-shared-ui';
 
-<Container maxWidth="lg" padding>
-  {/* Content */}
-</Container>
-```
-
-#### Footer
-
-```tsx
-import { Footer } from '@psytor/astrogators-shared-ui';
-
+<TopBar logo={<Logo />} rightContent={<UserMenu />} />
+<Container maxWidth="lg" padding>{children}</Container>
 <Footer />
 ```
 
-### Form Components
-
-#### Button
+### Forms
 
 ```tsx
-import { Button } from '@psytor/astrogators-shared-ui';
+import { Button, Input, Select, AllyCodeDropdown } from '@psytor/astrogators-shared-ui';
 
-<Button variant="primary" size="md" onClick={handleClick}>
-  Click Me
-</Button>
+<Button variant="primary" size="md" loading={submitting}>Save</Button>
+<Input label="Email" type="email" required error={errors.email} />
+<Select label="Profile" options={profiles} placeholder="Choose…" />
 
-<Button variant="outline" loading>
-  Loading...
-</Button>
+// Wired into useAuth — manages the user's ally codes (DB-backed when
+// authenticated, localStorage when anonymous):
+<AllyCodeDropdown />
 ```
 
-#### Input
+`Button` variants: `primary | secondary | outline | ghost | danger`.
+
+### Display
 
 ```tsx
-import { Input } from '@psytor/astrogators-shared-ui';
-
-<Input
-  label="Email"
-  type="email"
-  placeholder="Enter your email"
-  required
-  error={errors.email}
-/>
-```
-
-#### Select
-
-```tsx
-import { Select } from '@psytor/astrogators-shared-ui';
-
-<Select
-  label="Choose Profile"
-  options={[
-    { value: 'standard', label: 'Standard' },
-    { value: 'speed', label: 'Speed Focus' },
-  ]}
-  placeholder="Select a profile"
-/>
-```
-
-### Display Components
-
-#### Card
-
-```tsx
-import { Card } from '@psytor/astrogators-shared-ui';
+import { Card, Badge, Modal } from '@psytor/astrogators-shared-ui';
 
 <Card variant="elevated" chamfered chamferSize="md" padding="lg" hoverable>
-  <h3>The Mod Ledger</h3>
-  <p>Analyze your mods</p>
+  …
 </Card>
-```
-
-#### Badge
-
-```tsx
-import { Badge } from '@psytor/astrogators-shared-ui';
 
 <Badge variant="success">Active</Badge>
 <Badge variant="warning" size="sm">Beta</Badge>
+
+<Modal isOpen={open} onClose={close} title="Login" size="md">…</Modal>
 ```
 
-#### Modal
-
-```tsx
-import { Modal } from '@psytor/astrogators-shared-ui';
-
-<Modal
-  isOpen={isOpen}
-  onClose={() => setIsOpen(false)}
-  title="Login"
-  size="md"
->
-  {/* Modal content */}
-</Modal>
-```
-
-### Feedback Components
-
-#### Loader
+### Feedback
 
 ```tsx
 import { Loader } from '@psytor/astrogators-shared-ui';
@@ -174,82 +121,96 @@ import { Loader } from '@psytor/astrogators-shared-ui';
 
 ## Authentication
 
-### useAuth Hook
+`useAuth` returns the full auth + ally-code surface. The hook must be called
+inside `AuthProvider`.
 
 ```tsx
 import { useAuth } from '@psytor/astrogators-shared-ui';
 
-function MyComponent() {
-  const { user, isAuthenticated, login, logout, isLoading } = useAuth();
+const {
+  // session
+  user, isAuthenticated, isLoading,
+  login, register, logout, refreshUser,
+  forgotPassword, resetPassword, resendVerification,
 
-  const handleLogin = async () => {
-    try {
-      await login({
-        email: 'user@example.com',
-        password: 'password',
-      });
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  };
+  // backend feature flags (e.g. auth_enabled)
+  authEnabled, isLoadingFeatures,
 
-  if (isLoading) return <Loader />;
+  // ally codes — DB-backed when logged in, localStorage when anonymous
+  allyCodes, selectedAllyCode, isLoadingAllyCodes,
+  fetchAllyCodes, addAllyCode, removeAllyCode,
+  selectAllyCode, updateAllyCodeLastUsed,
 
-  return (
-    <div>
-      {isAuthenticated ? (
-        <div>
-          <p>Welcome, {user?.username}!</p>
-          <button onClick={logout}>Logout</button>
-        </div>
-      ) : (
-        <button onClick={handleLogin}>Login</button>
-      )}
-    </div>
-  );
-}
+  // localStorage → DB migration prompt for users who sign up after
+  // adding ally codes anonymously
+  migrationPrompt, dismissMigrationPrompt, migrateLocalStorageCodes,
+} = useAuth();
 ```
 
-## API Client
+Tokens are stored in `localStorage`. Registration does **not** auto-login —
+it requires email verification.
 
-### Using the API Client
+## API client
 
 ```tsx
 import { apiClient } from '@psytor/astrogators-shared-ui';
 
-// GET request
-const data = await apiClient.get('/api/v1/game-data/characters');
-
-// POST request
+const characters = await apiClient.get('/api/v1/game-data/characters');
 const result = await apiClient.post('/api/v1/mod-ledger/evaluate/123456789', {
   profile_name: 'standard',
 });
 ```
 
-The API client automatically:
-- Injects JWT access token in Authorization header
-- Refreshes expired tokens
-- Retries failed requests after token refresh
-- Calls `onUnauthorized` callback on auth failure
+The client:
+- injects the access token into `Authorization`
+- on `401`, transparently refreshes via `/api/v1/auth/refresh-token` and
+  retries the original request once
+- calls `onUnauthorized` if refresh fails
 
-## TypeScript Types
+Endpoints are written **without** the service prefix — the prefix lives in
+the configured `baseURL`.
 
-All TypeScript types are exported:
+## Ally code utilities
+
+For UI that needs to format/validate the 9-digit SWGOH player IDs outside the
+context of `useAuth`:
 
 ```tsx
-import type {
-  User,
-  LoginRequest,
-  LoginResponse,
-  ParsedMod,
-  ModEvaluation,
-  ApiError,
+import {
+  formatAllyCode,        // "123456789" → "123-456-789"
+  unformatAllyCode,      // "123-456-789" → "123456789"
+  getAllyCodesFromStorage,
+  saveAllyCodeToStorage,
+  removeAllyCodeFromStorage,
+  getSelectedAllyCode,
+  setSelectedAllyCode,
+  clearAllyCodes,
 } from '@psytor/astrogators-shared-ui';
 ```
 
-## CSS Variables
+Prefer `useAuth` when you can — it keeps DB and localStorage in sync.
 
-Customize the design system by overriding CSS variables:
+## TypeScript
+
+All public types are re-exported from the package root, including:
+
+```tsx
+import type {
+  User, LoginRequest, LoginResponse,
+  RegisterRequest, ForgotPasswordRequest, ResetPasswordRequest,
+  AllyCode, AllyCodeCreate, AllyCodeListResponse, StoredAllyCode,
+  ApiResponse, ApiError, PaginatedResponse,
+  ParsedMod, ModStat, ModEvaluation, EvaluationRequest, EvaluationResponse,
+} from '@psytor/astrogators-shared-ui';
+```
+
+Consumers should set `"moduleResolution": "bundler"` (or `"node16"`) in
+`tsconfig.json` so the bundled `.d.ts` files resolve.
+
+## Theming
+
+Design tokens are CSS variables on `:root`. Override anything you need in
+your own stylesheet, loaded after the library styles:
 
 ```css
 :root {
@@ -261,57 +222,32 @@ Customize the design system by overriding CSS variables:
 }
 ```
 
-## Chamfered Boxes
+### Chamfered boxes
 
-Use the chamfered box effect on any element:
-
-```tsx
-<div className="chamfered-box">
-  {/* Content with cut corners */}
-</div>
-
-<div className="chamfered-box-lg">
-  {/* Large chamfered corners */}
-</div>
-
-<div className="chamfered-box-sm">
-  {/* Small chamfered corners */}
-</div>
-```
-
-Or use the Card component:
+Sci-fi cut-corner effect, available as utility classes or via `Card`:
 
 ```tsx
-<Card chamfered chamferSize="lg">
-  {/* Content */}
-</Card>
+<div className="chamfered-box">…</div>
+<div className="chamfered-box-sm">…</div>
+<div className="chamfered-box-lg">…</div>
+
+<Card chamfered chamferSize="lg">…</Card>
 ```
 
 ## Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Build library
-npm run build
-
-# Type check
-npm run type-check
+npm run build        # tsc && vite build → dist/
+npm run type-check   # tsc --noEmit
 ```
 
-## Publishing
+There is no `dev` server worth running (this is a library, not an app).
+Iterate by rebuilding and reinstalling in a consumer, or `npm link`.
 
-```bash
-# Bump version
-npm version patch  # or minor, or major
-
-# Build
-npm run build
-
-# Publish to GitHub Packages
-npm publish
-```
+See `PUBLISHING.md` for the release procedure. The non-negotiable rule:
+**always `npm run build` before `npm publish`** — `dist/` is gitignored but
+is the only thing shipped, so skipping the build re-publishes stale code.
 
 ## License
 
