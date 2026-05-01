@@ -1,53 +1,54 @@
 # Publishing Workflow
 
-This document outlines the correct procedure for publishing the `astrogators-shared-ui` package to ensure that changes are correctly built and versioned.
+Procedure for cutting a new release of `astrogators-shared-ui`. The package
+is unscoped and published to the public **npmjs.org** registry — there is no
+GitHub Packages step despite the repo being hosted on GitHub.
 
-## Development
+## Roles
 
-1.  Make your code changes in the `src` directory.
+- **Claude** can edit `src/`, run `npm install`, `npm run build`, and
+  `npm version`.
+- **The user must run `npm login` and `npm publish`.** Publishing requires
+  interactive npm authentication (OTP / browser SSO), which Claude cannot
+  complete from the CLI sandbox. Claude will stop at the publish step and
+  hand off.
 
-## Pre-Publishing Checklist
+## Steps
 
-Before publishing a new version, you must ensure your changes are correctly built and the package version is updated.
-
-### 1. Install Dependencies
-
-If you haven't already, or if you've updated dependencies, run:
+### 1. Install dependencies (if needed)
 
 ```bash
 npm install
 ```
 
-This ensures that all `devDependencies` (like `typescript` and `vite`) are available for the build step.
-
-### 2. Build the Package
-
-Compile the TypeScript source code and bundle the assets into the `dist` directory. This is the directory that gets published.
+### 2. Build
 
 ```bash
 npm run build
 ```
 
-**CRITICAL:** You must run this command after making any code changes. Publishing without building will result in the old, stale code being published again.
+**CRITICAL:** Always build before publishing. `dist/` is gitignored but is
+the only thing shipped (`files: ["dist"]` in `package.json`), so skipping
+the build re-publishes stale code.
 
-### 3. Increment the Version
+### 3. Bump the version
 
-Update the version number in `package.json` according to the [Semantic Versioning](https://semver.org/) standard (e.g., `0.2.5` -> `0.2.6`). You can do this manually or with:
+Pick `patch` / `minor` / `major` per [SemVer](https://semver.org/):
 
 ```bash
-npm version patch # Or minor, or major
+npm version patch
 ```
 
-## 4. Publish to NPM
+### 4. Publish (user-run)
 
-Publish the new version to the npm registry. You must be logged in to npm for this to work (`npm login`).
+> Claude stops here. The user runs:
 
 ```bash
+npm login        # one-time per session, against registry.npmjs.org
 npm publish
 ```
 
-## 5. Update Consumer Packages
+### 5. Update consumers
 
-After the new version is published, go to any applications that consume this package (e.g., `mod-ledger-ui`) and update the version number in their respective `package.json` files.
-
-Then, reinstall the dependencies in those projects (e.g., by rebuilding the relevant Docker image or running `npm install`).
+Bump `astrogators-shared-ui` in each consumer's `package.json`
+(`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`) and reinstall.

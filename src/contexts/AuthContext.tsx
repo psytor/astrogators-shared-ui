@@ -246,6 +246,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
     }
   }, [user]);
 
+  // Update last_used_at
+  const updateAllyCodeLastUsed = useCallback(async (allyCodeId: number | string) => {
+    if (user && typeof allyCodeId === 'number') {
+      await apiClient.put(`/api/v1/users/me/ally-codes/${allyCodeId}/use`, {});
+      // Refresh list to get updated timestamp
+      await fetchAllyCodes();
+    } else if (!user && typeof allyCodeId === 'string') {
+      updateLocalStorageLastUsed(allyCodeId);
+      setAllyCodes(getAllyCodesFromStorage());
+    }
+  }, [user, fetchAllyCodes]);
+
+  // Select ally code
+  const selectAllyCode = useCallback((allyCode: string | null) => {
+    setSelectedAllyCodeState(allyCode);
+    setSelectedAllyCode(allyCode);
+
+    if (allyCode && user) {
+      // Update last_used_at for authenticated users
+      const code = allyCodes.find(ac => 'ally_code' in ac && ac.ally_code === allyCode);
+      if (code && 'id' in code) {
+        updateAllyCodeLastUsed(code.id as number);
+      }
+    } else if (allyCode && !user) {
+      // Update localStorage for anonymous users
+      updateLocalStorageLastUsed(allyCode);
+    }
+  }, [user, allyCodes, updateAllyCodeLastUsed]);
+
   // Add ally code
   const addAllyCode = useCallback(async (allyCode: string) => {
     // Format validation (9 digits)
@@ -268,7 +297,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
       }
     } else {
       // Anonymous: validate via player data API, then save to localStorage
-      const playerData = await apiClient.get<any>(`/api/v1/player-data/player/${allyCode}`);
+      const playerData = await apiClient.get<{ data?: { name?: string } } | null>(
+        `/api/v1/player-data/player/${allyCode}`
+      );
 
       if (!playerData) {
         throw new Error('Invalid ally code - player not found');
@@ -276,7 +307,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
 
       const storedCode: StoredAllyCode = {
         ally_code: allyCode,
-        player_name: (playerData as any)?.data?.name || null,
+        player_name: playerData.data?.name ?? null,
         last_used_at: new Date().toISOString(),
       };
 
@@ -288,7 +319,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
         selectAllyCode(allyCode);
       }
     }
-  }, [user, allyCodes.length]);
+  }, [user, allyCodes.length, selectAllyCode]);
 
   // Remove ally code
   const removeAllyCode = useCallback(async (allyCodeId: number | string) => {
@@ -306,36 +337,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
         selectAllyCode(null);
       }
     }
-  }, [user, selectedAllyCode]);
-
-  // Select ally code
-  const selectAllyCode = useCallback((allyCode: string | null) => {
-    setSelectedAllyCodeState(allyCode);
-    setSelectedAllyCode(allyCode);
-
-    if (allyCode && user) {
-      // Update last_used_at for authenticated users
-      const code = allyCodes.find(ac => 'ally_code' in ac && ac.ally_code === allyCode);
-      if (code && 'id' in code) {
-        updateAllyCodeLastUsed(code.id as number);
-      }
-    } else if (allyCode && !user) {
-      // Update localStorage for anonymous users
-      updateLocalStorageLastUsed(allyCode);
-    }
-  }, [user, allyCodes]);
-
-  // Update last_used_at
-  const updateAllyCodeLastUsed = useCallback(async (allyCodeId: number | string) => {
-    if (user && typeof allyCodeId === 'number') {
-      await apiClient.put(`/api/v1/users/me/ally-codes/${allyCodeId}/use`, {});
-      // Refresh list to get updated timestamp
-      await fetchAllyCodes();
-    } else if (!user && typeof allyCodeId === 'string') {
-      updateLocalStorageLastUsed(allyCodeId);
-      setAllyCodes(getAllyCodesFromStorage());
-    }
-  }, [user, fetchAllyCodes]);
+  }, [user, selectedAllyCode, selectAllyCode]);
 
   // Migration support
   const dismissMigrationPrompt = useCallback(() => {

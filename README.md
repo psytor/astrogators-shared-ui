@@ -1,25 +1,20 @@
-# @psytor/astrogators-shared-ui
+# astrogators-shared-ui
 
 Shared React components, auth, and API client for the Astrogator's Table
-frontends (`astrogators-hub`, `mod-ledger-ui`). Published to GitHub Packages.
+frontends (`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`). Published
+to the public npm registry as `astrogators-shared-ui` (unscoped).
+
+> The git repo lives under `psytor/astrogators-shared-ui` on GitHub, but the
+> package itself is published to **npmjs.org**, not GitHub Packages. No
+> `.npmrc` scope config is needed to install.
 
 This is a library — there is no app shell here. See `PUBLISHING.md` for the
 release flow and `CLAUDE.md` for architecture notes.
 
 ## Installation
 
-The package is hosted on GitHub Packages, so consumers need an `.npmrc`
-pointing the `@psytor` scope at the right registry:
-
-```
-@psytor:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_PAT}
-```
-
-The PAT needs `read:packages` scope. Then:
-
 ```bash
-npm install @psytor/astrogators-shared-ui
+npm install astrogators-shared-ui
 ```
 
 Peer dependencies: `react` and `react-dom` (18 or 19).
@@ -34,8 +29,8 @@ manages auth, feature flags, and ally codes for the whole app. Pass the
 `/<service-name>` (see the workspace `CLAUDE.md`).
 
 ```tsx
-import { AuthProvider } from '@psytor/astrogators-shared-ui';
-import '@psytor/astrogators-shared-ui/styles';
+import { AuthProvider } from 'astrogators-shared-ui';
+import 'astrogators-shared-ui/styles';
 
 function App() {
   return (
@@ -55,7 +50,7 @@ dev.
 you need a custom `onUnauthorized` handler (e.g. router-driven redirects):
 
 ```tsx
-import { initializeApiClient } from '@psytor/astrogators-shared-ui';
+import { initializeApiClient } from 'astrogators-shared-ui';
 
 initializeApiClient({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -72,7 +67,7 @@ All components are styled via CSS Modules and the global design tokens in
 ### Layout
 
 ```tsx
-import { TopBar, Container, Footer } from '@psytor/astrogators-shared-ui';
+import { TopBar, Container, Footer } from 'astrogators-shared-ui';
 
 <TopBar logo={<Logo />} rightContent={<UserMenu />} />
 <Container maxWidth="lg" padding>{children}</Container>
@@ -82,7 +77,7 @@ import { TopBar, Container, Footer } from '@psytor/astrogators-shared-ui';
 ### Forms
 
 ```tsx
-import { Button, Input, Select, AllyCodeDropdown } from '@psytor/astrogators-shared-ui';
+import { Button, Input, Select, AllyCodeDropdown } from 'astrogators-shared-ui';
 
 <Button variant="primary" size="md" loading={submitting}>Save</Button>
 <Input label="Email" type="email" required error={errors.email} />
@@ -98,7 +93,7 @@ import { Button, Input, Select, AllyCodeDropdown } from '@psytor/astrogators-sha
 ### Display
 
 ```tsx
-import { Card, Badge, Modal } from '@psytor/astrogators-shared-ui';
+import { Card, Badge, Modal } from 'astrogators-shared-ui';
 
 <Card variant="elevated" chamfered chamferSize="md" padding="lg" hoverable>
   …
@@ -113,7 +108,7 @@ import { Card, Badge, Modal } from '@psytor/astrogators-shared-ui';
 ### Feedback
 
 ```tsx
-import { Loader } from '@psytor/astrogators-shared-ui';
+import { Loader } from 'astrogators-shared-ui';
 
 <Loader size="md" variant="spinner" />
 <Loader size="lg" variant="dots" />
@@ -125,7 +120,7 @@ import { Loader } from '@psytor/astrogators-shared-ui';
 inside `AuthProvider`.
 
 ```tsx
-import { useAuth } from '@psytor/astrogators-shared-ui';
+import { useAuth } from 'astrogators-shared-ui';
 
 const {
   // session
@@ -153,7 +148,7 @@ it requires email verification.
 ## API client
 
 ```tsx
-import { apiClient } from '@psytor/astrogators-shared-ui';
+import { apiClient } from 'astrogators-shared-ui';
 
 const characters = await apiClient.get('/api/v1/game-data/characters');
 const result = await apiClient.post('/api/v1/mod-ledger/evaluate/123456789', {
@@ -185,7 +180,7 @@ import {
   getSelectedAllyCode,
   setSelectedAllyCode,
   clearAllyCodes,
-} from '@psytor/astrogators-shared-ui';
+} from 'astrogators-shared-ui';
 ```
 
 Prefer `useAuth` when you can — it keeps DB and localStorage in sync.
@@ -201,7 +196,7 @@ import type {
   AllyCode, AllyCodeCreate, AllyCodeListResponse, StoredAllyCode,
   ApiResponse, ApiError, PaginatedResponse,
   ParsedMod, ModStat, ModEvaluation, EvaluationRequest, EvaluationResponse,
-} from '@psytor/astrogators-shared-ui';
+} from 'astrogators-shared-ui';
 ```
 
 Consumers should set `"moduleResolution": "bundler"` (or `"node16"`) in
@@ -243,11 +238,14 @@ npm run type-check   # tsc --noEmit
 ```
 
 There is no `dev` server worth running (this is a library, not an app).
-Iterate by rebuilding and reinstalling in a consumer, or `npm link`.
+Iterate by rebuilding and reinstalling in a consumer.
 
-See `PUBLISHING.md` for the release procedure. The non-negotiable rule:
-**always `npm run build` before `npm publish`** — `dist/` is gitignored but
-is the only thing shipped, so skipping the build re-publishes stale code.
+See `PUBLISHING.md` for the release procedure. Two non-negotiable rules:
+- **Always `npm run build` before `npm publish`** — `dist/` is gitignored
+  but is the only thing shipped, so skipping the build re-publishes stale
+  code.
+- **`npm login` and `npm publish` must be run by the user**, not by Claude
+  — publishing needs interactive npm auth.
 
 ## License
 

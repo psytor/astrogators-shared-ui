@@ -5,10 +5,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this submodule is
 
 `astrogators-shared-ui` is a **publishable React component + auth library**, not an
-application. It is built with Vite in library mode and shipped as
-`@psytor/astrogators-shared-ui` on GitHub Packages. It is consumed by the
-workspace's frontends (`astrogators-hub`, `mod-ledger-ui`) — there is no app
-shell, no router, and no `index.html` runtime here.
+application. It is built with Vite in library mode and published as the
+unscoped package `astrogators-shared-ui` on the public **npmjs.org** registry
+(the git repo is hosted on GitHub, but the package is *not* on GitHub
+Packages). It is consumed by the workspace's frontends (`astrogators-hub`,
+`mod-ledger-ui`, `nightwatcher-ui`) — there is no app shell, no router, and
+no `index.html` runtime here.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
@@ -34,10 +36,12 @@ The single most load-bearing rule: **`npm run build` BEFORE `npm publish`** —
 only `dist/` is shipped (`files: ["dist"]`), and `dist/` is gitignored, so
 skipping the build re-publishes stale code. The flow is:
 
-1. Edit `src/`
-2. `npm run build`
-3. `npm version patch|minor|major` (bumps `package.json`)
-4. `npm publish` (requires `npm login` against GitHub Packages)
+1. Edit `src/` (Claude)
+2. `npm run build` (Claude)
+3. `npm version patch|minor|major` — bumps `package.json` (Claude)
+4. `npm login` + `npm publish` against npmjs.org — **must be run by the
+   user**; publishing requires interactive npm auth (OTP / browser SSO) that
+   Claude cannot complete
 5. Bump the version in each consumer's `package.json` and reinstall
 
 ## Architecture
@@ -56,7 +60,7 @@ ship into every consumer. The library currently has zero runtime deps and uses
 the platform `fetch` directly in `services/api.ts` rather than pulling in axios.
 
 CSS is bundled as a single file (`cssCodeSplit: false`) and exposed via the
-`./styles` export — consumers must `import '@psytor/astrogators-shared-ui/styles'`
+`./styles` export — consumers must `import 'astrogators-shared-ui/styles'`
 once at their entry. Per-component styles are CSS Modules; global tokens and
 the chamfered-box utility classes live in `src/styles/`.
 
