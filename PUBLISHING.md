@@ -31,7 +31,13 @@ npm run build
 the only thing shipped (`files: ["dist"]` in `package.json`), so skipping
 the build re-publishes stale code.
 
-### 3. Bump the version
+### 3. Update CHANGELOG
+
+Before bumping the version, move the entries you're about to ship from
+`[Unreleased]` into a new versioned section in `CHANGELOG.md`. Date the
+section with today's date. Update the compare-link footer.
+
+### 4. Bump the version
 
 Pick `patch` / `minor` / `major` per [SemVer](https://semver.org/):
 
@@ -39,7 +45,7 @@ Pick `patch` / `minor` / `major` per [SemVer](https://semver.org/):
 npm version patch
 ```
 
-### 4. Publish (user-run)
+### 5. Publish (user-run)
 
 > Claude stops here. The user runs:
 
@@ -48,7 +54,7 @@ npm login        # one-time per session, against registry.npmjs.org
 npm publish
 ```
 
-### 5. Update consumers
+### 6. Update consumers
 
 Bump `astrogators-shared-ui` in each consumer's `package.json`
 (`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`) and reinstall.

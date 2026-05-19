@@ -9,7 +9,8 @@ to the public npm registry as `astrogators-shared-ui` (unscoped).
 > `.npmrc` scope config is needed to install.
 
 This is a library — there is no app shell here. See `PUBLISHING.md` for the
-release flow and `CLAUDE.md` for architecture notes.
+release flow, `CHANGELOG.md` for what shipped in each version, and
+`CLAUDE.md` for architecture notes.
 
 ## Installation
 
