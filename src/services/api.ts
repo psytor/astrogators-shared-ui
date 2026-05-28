@@ -28,7 +28,7 @@ export class ApiClient {
       throw new Error('No refresh token available');
     }
 
-    const response = await fetch(`${this.baseURL}/api/v1/auth/refresh-token`, {
+    const response = await fetch(`${this.baseURL}/api/v1/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export class ApiClient {
     }
 
     const data: RefreshTokenResponse = await response.json();
-    setTokens(data.access_token, refreshToken);
+    setTokens(data.access_token, data.refresh_token);
     return data.access_token;
   }
 
