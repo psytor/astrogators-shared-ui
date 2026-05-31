@@ -60,7 +60,7 @@ export const Card: React.FC<CardProps> = ({
           <div className="chamfered-diagonal-border chamfered-diagonal-tl" style={borderStyle} />
           <div className="chamfered-diagonal-border chamfered-diagonal-tr" style={borderStyle} />
           <div className="chamfered-diagonal-border chamfered-diagonal-bl" style={borderStyle} />
-          <div className={`chamfered-diagonal-border ${chamferSize === 'asymmetric' ? 'chamfered-diagonal-br-large' : 'chamfered-diagonal-br'}`} style={borderStyle} />
+          <div className="chamfered-diagonal-border chamfered-diagonal-br" style={borderStyle} />
         </>
       )}
       {children}

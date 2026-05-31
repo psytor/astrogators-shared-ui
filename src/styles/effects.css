@@ -6,76 +6,54 @@
 /* ========== CHAMFERED BOXES ========== */
 
 /**
- * Chamfered Box - Standard
- * Creates a box with cut corners (sci-fi aesthetic)
- * Usage: Add class "chamfered-box" to any element
+ * Chamfered Box - parametric
+ *
+ * One clip-path drives every size. Each size class only sets two locals:
+ *   --_chamfer     : the cut size for TL / TR / BL corners
+ *   --_chamfer-br  : the cut size for the BR corner (== --_chamfer except
+ *                    on the asymmetric "signature" variant, where BR is 2x)
+ *
+ * The diagonal corner lines below read the SAME two locals, so the lines and
+ * the cut can never drift apart at any size. To add a size, add one class that
+ * sets the two locals — never touch the polygon or the line geometry again.
+ *
+ * Usage: add "chamfered-box" (default), "-sm", "-lg", or "-asymmetric".
  */
 .chamfered-box {
-  position: relative;
-  clip-path: polygon(
-    var(--chamfer-size) 0,
-    calc(100% - var(--chamfer-size)) 0,
-    100% var(--chamfer-size),
-    100% calc(100% - var(--chamfer-size)),
-    calc(100% - var(--chamfer-size)) 100%,
-    var(--chamfer-size) 100%,
-    0 calc(100% - var(--chamfer-size)),
-    0 var(--chamfer-size)
-  );
+  --_chamfer: var(--chamfer-size);
+  --_chamfer-br: var(--chamfer-size);
 }
 
-/**
- * Chamfered Box - Large
- * Larger cut corners for emphasis
- */
-.chamfered-box-lg {
-  position: relative;
-  clip-path: polygon(
-    var(--chamfer-size-lg) 0,
-    calc(100% - var(--chamfer-size-lg)) 0,
-    100% var(--chamfer-size-lg),
-    100% calc(100% - var(--chamfer-size-lg)),
-    calc(100% - var(--chamfer-size-lg)) 100%,
-    var(--chamfer-size-lg) 100%,
-    0 calc(100% - var(--chamfer-size-lg)),
-    0 var(--chamfer-size-lg)
-  );
-}
-
-/**
- * Chamfered Box - Small
- * Subtle cut corners
- */
 .chamfered-box-sm {
-  position: relative;
-  clip-path: polygon(
-    var(--chamfer-size-sm) 0,
-    calc(100% - var(--chamfer-size-sm)) 0,
-    100% var(--chamfer-size-sm),
-    100% calc(100% - var(--chamfer-size-sm)),
-    calc(100% - var(--chamfer-size-sm)) 100%,
-    var(--chamfer-size-sm) 100%,
-    0 calc(100% - var(--chamfer-size-sm)),
-    0 var(--chamfer-size-sm)
-  );
+  --_chamfer: var(--chamfer-size-sm);
+  --_chamfer-br: var(--chamfer-size-sm);
 }
 
-/**
- * Chamfered Box - Asymmetric (Signature Design)
- * 3 corners at 12px, bottom-right corner at 24px
- * Creates a distinctive, bold aesthetic
- */
+.chamfered-box-lg {
+  --_chamfer: var(--chamfer-size-lg);
+  --_chamfer-br: var(--chamfer-size-lg);
+}
+
+/* Asymmetric (signature): 3 corners at 12px, bottom-right at 24px */
+.chamfered-box-asymmetric {
+  --_chamfer: 12px;
+  --_chamfer-br: 24px;
+}
+
+.chamfered-box,
+.chamfered-box-sm,
+.chamfered-box-lg,
 .chamfered-box-asymmetric {
   position: relative;
   clip-path: polygon(
-    12px 0%,
-    calc(100% - 12px) 0%,
-    100% 12px,
-    100% calc(100% - 24px),
-    calc(100% - 24px) 100%,
-    12px 100%,
-    0% calc(100% - 12px),
-    0% 12px
+    var(--_chamfer) 0,
+    calc(100% - var(--_chamfer)) 0,
+    100% var(--_chamfer),
+    100% calc(100% - var(--_chamfer-br)),
+    calc(100% - var(--_chamfer-br)) 100%,
+    var(--_chamfer) 100%,
+    0 calc(100% - var(--_chamfer)),
+    0 var(--_chamfer)
   );
 }
 
@@ -118,8 +96,18 @@
  * Creates visible lines on the cut corners
  * Usage: Add .chamfered-diagonal-borders and include corner div elements
  */
+/*
+ * Each corner line overlays the 45deg cut produced by the clip-path above.
+ * A cut of size c has a hypotenuse of length c * sqrt(2) (--_chamfer-diag),
+ * so width and position are derived from the SAME locals the clip-path uses.
+ * The -1px nudges centre the 2px line weight on the cut; line weight is
+ * overridable per consumer via height.
+ */
 .chamfered-diagonal-border {
+  --_chamfer-diag: calc(var(--_chamfer) * 1.41421356);
+  --_chamfer-diag-br: calc(var(--_chamfer-br) * 1.41421356);
   position: absolute;
+  height: 2px;
   background-color: currentColor;
   transition: background-color 0.3s ease;
   z-index: 5;
@@ -129,49 +117,35 @@
 /* Top-left corner diagonal */
 .chamfered-diagonal-tl {
   top: -1px;
-  left: 11px;
-  width: 16px;
-  height: 2px;
+  left: calc(var(--_chamfer) - 1px);
+  width: var(--_chamfer-diag);
   transform: rotate(135deg);
   transform-origin: left center;
 }
 
 /* Top-right corner diagonal */
 .chamfered-diagonal-tr {
-  top: 10px;
-  right: 0px;
-  width: 18px;
-  height: 2px;
+  top: calc(var(--_chamfer) - 1px);
+  right: -1px;
+  width: var(--_chamfer-diag);
   transform: rotate(45deg);
   transform-origin: right center;
 }
 
 /* Bottom-left corner diagonal */
 .chamfered-diagonal-bl {
-  bottom: -2px;
-  left: 12px;
-  width: 20px;
-  height: 2px;
+  bottom: -1px;
+  left: calc(var(--_chamfer) - 1px);
+  width: var(--_chamfer-diag);
   transform: rotate(-135deg);
   transform-origin: left center;
 }
 
-/* Bottom-right corner diagonal (standard 12px chamfer) */
+/* Bottom-right corner diagonal (reads --_chamfer-br: correct for asymmetric too) */
 .chamfered-diagonal-br {
-  bottom: 11px;
+  bottom: calc(var(--_chamfer-br) - 1px);
   right: -1px;
-  width: 18px;
-  height: 2px;
-  transform: rotate(-45deg);
-  transform-origin: right center;
-}
-
-/* Bottom-right corner diagonal (asymmetric 24px chamfer) */
-.chamfered-diagonal-br-large {
-  bottom: 23px;
-  right: -1px;
-  width: 35px;
-  height: 2px;
+  width: var(--_chamfer-diag-br);
   transform: rotate(-45deg);
   transform-origin: right center;
 }
