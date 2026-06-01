@@ -31,6 +31,13 @@ export { ApiClient, apiClient, initializeApiClient } from './services/api';
 export type { ApiClientConfig } from './services/api';
 
 export {
+  authedFetch,
+  refreshAccessToken,
+  configureAuthRefresh,
+} from './services/tokenRefresh';
+export type { AuthRefreshConfig } from './services/tokenRefresh';
+
+export {
   getAccessToken,
   setAccessToken,
   removeAccessToken,

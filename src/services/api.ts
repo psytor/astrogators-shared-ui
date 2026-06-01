@@ -1,10 +1,16 @@
 /**
  * API Client
- * HTTP client with JWT token injection and automatic refresh
+ * HTTP client with JWT token injection and automatic refresh.
+ *
+ * Token injection + refresh-and-retry are delegated to the shared
+ * `authedFetch` primitive (services/tokenRefresh) so there is ONE refresh
+ * implementation across the app, and any service-specific client (with its
+ * own base URL) can reuse it. This class is the convenience layer on top:
+ * base-URL joining, JSON encoding, and structured error parsing.
  */
 
-import { getAccessToken, setTokens, clearTokens, getRefreshToken } from './auth';
-import type { ApiError, RefreshTokenResponse } from '../types';
+import type { ApiError } from '../types';
+import { authedFetch, configureAuthRefresh } from './tokenRefresh';
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -13,85 +19,31 @@ export interface ApiClientConfig {
 
 export class ApiClient {
   private baseURL: string;
-  private onUnauthorized?: () => void;
-  private isRefreshing = false;
-  private refreshPromise: Promise<string> | null = null;
 
   constructor(config: ApiClientConfig) {
     this.baseURL = config.baseURL;
-    this.onUnauthorized = config.onUnauthorized;
-  }
-
-  private async refreshAccessToken(): Promise<string> {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    const response = await fetch(`${this.baseURL}/api/v1/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
+    // The refresh endpoint lives on this auth base URL; wire the shared
+    // primitive so authedFetch (here and in other clients) can refresh.
+    configureAuthRefresh({
+      baseURL: config.baseURL,
+      onUnauthorized: config.onUnauthorized,
     });
-
-    if (!response.ok) {
-      clearTokens();
-      this.onUnauthorized?.();
-      throw new Error('Token refresh failed');
-    }
-
-    const data: RefreshTokenResponse = await response.json();
-    setTokens(data.access_token, data.refresh_token);
-    return data.access_token;
   }
 
   async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const accessToken = getAccessToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
     };
 
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-    }
-
     const url = `${this.baseURL}${endpoint}`;
-    let response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    // Handle token expiration
-    if (response.status === 401 && accessToken) {
-      // Prevent multiple simultaneous refresh attempts
-      if (!this.isRefreshing) {
-        this.isRefreshing = true;
-        this.refreshPromise = this.refreshAccessToken()
-          .finally(() => {
-            this.isRefreshing = false;
-            this.refreshPromise = null;
-          });
-      }
-
-      try {
-        const newAccessToken = await this.refreshPromise!;
-        headers['Authorization'] = `Bearer ${newAccessToken}`;
-
-        // Retry the original request with new token
-        response = await fetch(url, {
-          ...options,
-          headers,
-        });
-      } catch (error) {
-        throw new Error('Authentication failed');
-      }
-    }
+    // authedFetch injects the bearer token and, on a 401, refreshes once and
+    // retries. A surviving 401 (refresh token also dead) falls through to the
+    // structured-error path below as an ordinary 401.
+    const response = await authedFetch(url, { ...options, headers });
 
     if (!response.ok) {
       const error: ApiError = {
