@@ -42,7 +42,11 @@ export const Card: React.FC<CardProps> = ({
       : 'chamfered-box'
     : '';
 
-  const borderStyle = diagonalBorderColor ? { color: diagonalBorderColor } : undefined;
+  const accent = showDiagonalBorders ? diagonalBorderColor : undefined;
+  const borderStyle = accent ? { color: accent } : undefined;
+  const rootStyle = accent
+    ? ({ ...style, ['--card-edge-color']: accent } as React.CSSProperties)
+    : style;
 
   return (
     <div
@@ -52,7 +56,7 @@ export const Card: React.FC<CardProps> = ({
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      style={style}
+      style={rootStyle}
     >
       {/* Diagonal corner borders (optional) */}
       {showDiagonalBorders && (
