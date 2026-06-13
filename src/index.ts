@@ -7,8 +7,8 @@
 import './styles/global.css';
 
 // Layout Components
-export { Container, TopBar, Footer } from './components/layout';
-export type { ContainerProps, TopBarProps, FooterProps } from './components/layout';
+export { Container, TopBar, NavBar, Footer } from './components/layout';
+export type { ContainerProps, TopBarProps, NavBarProps, NavItem, FooterProps } from './components/layout';
 
 // Form Components
 export { Button, Input, Select, AllyCodeDropdown } from './components/forms';
