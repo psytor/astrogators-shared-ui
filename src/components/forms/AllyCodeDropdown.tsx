@@ -80,20 +80,20 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
     }
   };
 
-  if (allyCodes.length === 0) {
-    return null; // Don't show dropdown if no codes saved
-  }
+  const hasCodes = allyCodes.length > 0;
 
   return (
     <div className={`${styles.allyCodeDropdown} ${className}`}>
-      <Select
-        options={options}
-        value={selectedAllyCode || ''}
-        onChange={handleSelectChange}
-        placeholder="Select ally code"
-        disabled={isLoadingAllyCodes}
-        className={styles.select}
-      />
+      {hasCodes && (
+        <Select
+          options={options}
+          value={selectedAllyCode || ''}
+          onChange={handleSelectChange}
+          placeholder="Select ally code"
+          disabled={isLoadingAllyCodes}
+          className={styles.select}
+        />
+      )}
 
       {showManage && (
         <div className={styles.managePanel}>
@@ -158,7 +158,7 @@ export const AllyCodeDropdown: React.FC<AllyCodeDropdownProps> = ({
         onClick={() => setShowManage(!showManage)}
         className={styles.manageButton}
       >
-        Manage
+        {hasCodes ? 'Manage' : '+ Add ally code'}
       </Button>
     </div>
   );
