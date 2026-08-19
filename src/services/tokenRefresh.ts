@@ -71,6 +71,28 @@ export const refreshAccessToken = (): Promise<string> => {
   return refreshPromise;
 };
 
+// Some endpoints (e.g. navicharts' optional-auth star-chart GET) accept a
+// missing/rejected token and just degrade behavior (anonymous view, a 404
+// for a private resource) instead of ever returning 401 — so the reactive
+// "refresh on 401" path below never fires for them, and a call made right
+// after the access token expires fails permanently instead of recovering.
+// Decoding `exp` client-side and refreshing proactively covers those
+// endpoints too, since it doesn't depend on the resource server's response.
+const EXPIRY_SKEW_SECONDS = 30;
+
+const isExpiredOrExpiringSoon = (token: string): boolean => {
+  try {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const { exp } = JSON.parse(atob(base64));
+    return typeof exp === 'number' && Date.now() / 1000 >= exp - EXPIRY_SKEW_SECONDS;
+  } catch {
+    // Unparseable token - let the request go out as-is and let the server
+    // reject it; not this function's job to decide it's invalid.
+    return false;
+  }
+};
+
 /**
  * `fetch` that injects the current bearer token and, on a 401 from an
  * authenticated request, refreshes the token once and retries.
@@ -87,7 +109,18 @@ export const authedFetch = async (
   input: string,
   init: RequestInit = {}
 ): Promise<Response> => {
-  const token = getAccessToken();
+  let token = getAccessToken();
+  if (token && isExpiredOrExpiringSoon(token)) {
+    try {
+      token = await refreshAccessToken();
+    } catch {
+      // Refresh failed - fall through with whatever's left in storage (likely
+      // now cleared) so the request goes out and the server gives a
+      // definitive, callers-can-react-to response rather than us throwing here.
+      token = getAccessToken();
+    }
+  }
+
   const headers: Record<string, string> = {
     ...(init.headers as Record<string, string>),
   };

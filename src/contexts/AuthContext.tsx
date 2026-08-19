@@ -86,12 +86,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
     localStorageCodes: [],
   });
 
-  // Initialize API client with provided base URL
-  useEffect(() => {
-    initializeApiClient({
-      baseURL: apiBaseUrl,
-    });
-  }, [apiBaseUrl]);
+  // Initialize API client with provided base URL - synchronously during
+  // render, not in a useEffect. Effects fire bottom-up (children's before
+  // their parent's), so a child component's own authedFetch call (e.g. a
+  // sibling app's api.ts hitting a different backend directly) can run
+  // before this effect would have, and see the refresh module's default
+  // (unconfigured, empty) auth base URL - producing a refresh request with
+  // no host/prefix. Calling this during render instead guarantees it's set
+  // before any child effect can fire. Idempotent, so safe on every render.
+  initializeApiClient({
+    baseURL: apiBaseUrl,
+  });
 
   // Fetch feature flags from API
   useEffect(() => {

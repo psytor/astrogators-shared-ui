@@ -9,6 +9,23 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.10.4] — 2026-08-19
+
+### Fixed
+- `authedFetch` now decodes the access token's `exp` client-side and
+  refreshes proactively (30s skew) instead of only reacting to a 401 from
+  the resource server. Optional-auth endpoints (e.g. navicharts' star-chart
+  GET) silently degrade an expired/rejected token to "anonymous" rather
+  than ever returning 401, so the old reactive-only refresh never fired for
+  them — a private chart reopened after the access token's 30-minute expiry
+  would permanently 404 as "not found" instead of transparently
+  re-authenticating.
+- `AuthProvider` now calls `initializeApiClient` synchronously during
+  render instead of inside a `useEffect`. Effects fire bottom-up (a child's
+  before its parent's), so a child component's own `authedFetch` call could
+  previously race ahead of `AuthProvider`'s effect and see the refresh
+  module's default (unconfigured) auth base URL.
+
 ## [0.6.1] — 2026-05-01
 
 This release covers everything between 0.3.1 and 0.6.1; no 0.4.x or 0.5.x
@@ -80,7 +97,8 @@ Input, Select, Card, Badge, Modal, Loader), `AuthProvider` / `useAuth`
 with transparent 401 refresh, shared CSS tokens and chamfered-box
 primitives. Pre-changelog; consult `git log` for finer detail.
 
-[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...HEAD
+[0.10.4]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.1...v0.10.4
 [0.6.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.3.1...v0.6.1
 [0.3.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/psytor/astrogators-shared-ui/compare/v0.2.3...v0.3.0
