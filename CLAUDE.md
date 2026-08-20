@@ -9,8 +9,9 @@ application. It is built with Vite in library mode and published as the
 unscoped package `astrogators-shared-ui` on the public **npmjs.org** registry
 (the git repo is hosted on GitHub, but the package is *not* on GitHub
 Packages). It is consumed by the workspace's frontends (`astrogators-hub`,
-`mod-ledger-ui`, `nightwatcher-ui`) — there is no app shell, no router, and
-no `index.html` runtime here.
+`mod-ledger-ui`, `nightwatcher-ui`, `navicharts-ui`) — there is no app shell,
+no router, and no `index.html` runtime here. Current published version is 0.10.4 — every
+consumer is bumped to it together, never left on a mismatched version.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
@@ -68,23 +69,57 @@ the chamfered-box utility classes live in `src/styles/`.
 
 - **Components** (`src/components/{layout,forms,display,feedback}`) — presentational
   React components. The "chamfered box" sci-fi cut-corner effect is a design
-  system primitive (`.chamfered-box[-sm|-lg]` and `Card chamfered`).
+  system primitive (`.chamfered-box[-sm|-lg]` and `Card chamfered`). `Card`
+  with `showDiagonalBorders` + `diagonalBorderColor` now also draws a real
+  1px border around the whole card in that color for free (`--card-edge-color`,
+  falls back to transparent) — consumers no longer need a local
+  `border: 1px solid ...` rule to get a visible edge on an accented card.
+- **`NavBar`** (`src/components/layout/NavBar.tsx`, built on the dumb `TopBar`
+  primitive) — the suite-wide top bar standard; see `../CLAUDE.md`'s NavBar
+  note. Router-agnostic (no react-router dep): consumers pass `NavItem[]`
+  with their own `active` state and an optional `render` prop for a router
+  `<Link>`; without `render` a tab is a plain `<a href>`. Bakes the
+  username/login/register/logout cluster via `useAuth` (`showAuth`, default
+  true) and the shared `AllyCodeDropdown` (`showAllyCode`, default false) —
+  apps consume `NavBar`, they don't hand-compose `TopBar` themselves. Auth
+  links (`/login`, `/register`, `/profile`) are plain anchors to the hub
+  origin since auth UI lives in the hub and everything is single-origin.
 - **Auth** (`src/contexts/AuthContext.tsx`, `src/services/auth.ts`) — JWT access
   + refresh tokens stored in `localStorage`, exposed through `AuthProvider` /
   `useAuth`. This is the canonical auth surface for the whole frontend mesh; do
-  not fork it per-app.
-- **API client** (`src/services/api.ts`) — `fetch` wrapper that injects the
-  access token, transparently refreshes on 401 via
-  `/api/v1/auth/refresh-token`, retries the original request, and calls a
-  consumer-provided `onUnauthorized` on terminal failure. Consumers wire it up
+  not fork it per-app. `AuthProvider` calls `initializeApiClient` synchronously
+  during render (not in a `useEffect`) — effects fire bottom-up, so a child's
+  own `authedFetch` call could otherwise race ahead of the provider's own
+  effect and hit an unconfigured auth base URL. The call is idempotent, so
+  this is safe on every render.
+- **API client** (`src/services/api.ts` + `src/services/tokenRefresh.ts`) —
+  `api.ts`'s `ApiClient` is a thin base-URL/JSON/error-parsing convenience
+  layer; actual token injection and refresh-and-retry live in the shared
+  `authedFetch` / `configureAuthRefresh` primitive in `tokenRefresh.ts`, so
+  there is one refresh implementation reused by every service-specific
+  client. `authedFetch` refreshes on two triggers: reactively on a 401 from
+  the resource server, AND proactively by decoding the access token's `exp`
+  client-side (30s skew) before the request goes out. The proactive path
+  exists because some endpoints (e.g. navicharts' optional-auth star-chart
+  GET) silently degrade an expired/rejected token to "anonymous" instead of
+  ever 401ing, so 401-only refresh never fired for them and an expired token
+  could permanently misbehave (e.g. a private resource 404ing as "not
+  found") instead of transparently re-authenticating. Consumers wire it up
   once with `initializeApiClient({ baseURL, onUnauthorized })`. The `baseURL`
   is the **prefixed** backend URL (e.g.
   `http://localhost:8000/astrogators-table`) per the workspace
   `SERVICE_PREFIX` convention — this library should never assume a bare host.
 - **Ally-code storage** (`src/services/allyCodeStorage.ts`,
   `AllyCodeDropdown`, `formatAllyCode`) — SWGOH-specific 9-digit player ID
-  management persisted in `localStorage`.
+  management persisted in `localStorage`. `AllyCodeDropdown` always renders
+  its trigger button even with zero saved codes (labeled "+ Add ally code"
+  instead of "Manage") — only the `Select` itself is conditional on having
+  codes — so a user with no codes can still reach the add form instead of
+  the whole control disappearing.
 - **Types** (`src/types/`) — request/response DTOs that mirror the backend
-  contracts (`astrogators-table` for auth, `mod-ledger` for mods). When a
-  backend DTO changes, update the matching type here and bump a minor
-  version, since every consumer sees the change at once.
+  contracts (`astrogators-table` for auth, `mod-ledger` for mods). `User`
+  includes a `role` field (mirrors the backend, which has always returned
+  it) so consumers can gate admin-only actions client-side, e.g. navicharts'
+  Publish-to-Curated. When a backend DTO changes, update the matching type
+  here and bump a minor version, since every consumer sees the change at
+  once.
