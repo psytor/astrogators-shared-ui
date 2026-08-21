@@ -58,6 +58,8 @@ export {
   setSelectedAllyCode,
   clearAllyCodes,
 } from './services/allyCodeStorage';
+
+export { fetchUsernames } from './services/users';
 export type { StoredAllyCode } from './services/allyCodeStorage';
 
 // Utils
