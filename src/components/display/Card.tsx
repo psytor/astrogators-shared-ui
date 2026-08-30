@@ -17,8 +17,11 @@ export interface CardProps {
    */
   edgeColor?: string;
   /**
-   * Draw the 45deg lines across the chamfered corner cuts. They always use
-   * `edgeColor` — they never carry a colour of their own.
+   * Draw the 45deg lines across the chamfered corner cuts. Defaults to `true`
+   * for a chamfered card — a chamfered card finishes its cut corners with a
+   * line, always, so the outline reads as closed. Set `false` only to leave a
+   * deliberately bare cut. Ignored on a non-chamfered card. Always uses
+   * `edgeColor`; carries no colour of its own.
    */
   showDiagonalBorders?: boolean;
   className?: string;
@@ -37,7 +40,7 @@ export const Card: React.FC<CardProps> = ({
   chamferSize = 'md',
   padding = 'md',
   hoverable = false,
-  showDiagonalBorders = false,
+  showDiagonalBorders = true,
   edgeColor,
   className = '',
   onClick,
@@ -75,9 +78,11 @@ export const Card: React.FC<CardProps> = ({
       tabIndex={onClick ? 0 : undefined}
       style={rootStyle}
     >
-      {/* Diagonal corner lines (optional) — colour comes from resolvedEdgeColor,
-          the same value that paints the straight border. */}
-      {showDiagonalBorders && (
+      {/* Diagonal corner lines — drawn for every chamfered card so the cut
+          corners are always finished off (pass showDiagonalBorders={false} to
+          leave a bare cut). Colour is resolvedEdgeColor, the same value that
+          paints the straight border, so corners and sides always match. */}
+      {chamfered && showDiagonalBorders && (
         <>
           <div className="chamfered-diagonal-border chamfered-diagonal-tl" style={lineStyle} />
           <div className="chamfered-diagonal-border chamfered-diagonal-tr" style={lineStyle} />
