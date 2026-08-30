@@ -134,3 +134,69 @@ the chamfered-box utility classes live in `src/styles/`.
   Publish-to-Curated. When a backend DTO changes, update the matching type
   here and bump a minor version, since every consumer sees the change at
   once.
+
+## Using `Card` (the chamfered box) — read before adding one
+
+`Card` (`src/components/display/Card.tsx`) is the design-system panel. The
+chamfered variant is a **self-contained primitive**: one prop owns the whole
+outline, and there is exactly one right way to use it. This section exists
+because getting it wrong recurred ~10 times and cost a 0.12.0 + 0.13.0.
+
+### The rules
+
+1. **A chamfered card = `<Card chamfered>`.** That alone gives you clipped
+   corners **+** the 45° corner lines **+** a straight border, all in **one
+   colour**. You do not opt into the lines or the border separately.
+
+2. **Colour comes from the `edgeColor` prop, nothing else.**
+   - `<Card chamfered edgeColor="var(--color-primary)">` → whole outline is
+     primary.
+   - `<Card chamfered>` with no `edgeColor` → whole outline is
+     `var(--color-border)` (the default; never transparent, never invisible).
+   - `edgeColor` takes any CSS colour string (token, hex, `rgba()`).
+
+3. **Never re-declare `border`, `border-color`, or `--card-edge-color` in the
+   card's own CSS.** This is *the* bug. The moment a local rule paints the
+   sides, it drifts from the corner lines. The `edgeColor` prop is the single
+   source of truth — feed it, don't fight it. (If you catch yourself writing
+   `.myCard { border: 1px solid ... }` on a chamfered card, stop.)
+
+4. **State-driven colour → change the `edgeColor` *prop value* from React**,
+   e.g. `edgeColor={active ? 'var(--color-primary)' : 'var(--color-border)'}`
+   or from hover state held in `useState`. **Do not** try to drive it from a
+   CSS `:hover` rule or a stylesheet custom property — the corner lines update
+   but `border-color` reading the value through `var()` goes stale in the
+   bundled build, and the card goes two-tone on hover. Colour changes must be
+   a prop change (a React re-render), full stop.
+
+5. **`chamferSize`**: `"sm"` (4px) | `"md"` (8px, default) | `"lg"` (12px) |
+   `"asymmetric"` (12px / 24px bottom-right). At `"sm"` the corner lines are
+   short — that's correct (they trace a 4px cut), just subtle.
+
+6. **Rare opt-outs:**
+   - deliberately edgeless chamfered card → `edgeColor="transparent"`.
+   - keep the border but no corner lines → `showDiagonalBorders={false}`.
+   These are unusual; the default (lines + border, matched) is almost always
+   what you want.
+
+### Not using `<Card>` (raw chamfer in a canvas, etc.)
+
+Add the `.chamfered-box` / `.chamfered-box-sm` / `-lg` class for the clip, hand-
+place four `<div class="chamfered-diagonal-border chamfered-diagonal-{tl,tr,bl,br}">`
+children, set their colour with an inline `style={{ color: X }}`, and add your
+own matching `border` in CSS. You own keeping the two in sync — there's no
+primitive doing it for you. Only do this when `<Card>` genuinely can't be used
+(e.g. React Flow nodes).
+
+### Internals (for when you need to change the primitive)
+
+- `edgeColor` → the component sets `--card-edge-color` inline on the card
+  (drives `border` via `.card { border: 1px solid var(--card-edge-color) }`)
+  **and** `color` inline on each line div (they're `background-color:
+  currentColor`). One value, two channels, same render pass — can't disagree.
+- `--card-edge-color` is registered `@property { inherits: false }` in
+  `src/styles/effects.css` — stops a nested card inheriting an ancestor's edge
+  colour (consumers used to scatter `--card-edge-color: transparent` resets to
+  fight that).
+- Line divs render on `chamfered && showDiagonalBorders`; `showDiagonalBorders`
+  defaults to `true` (since 0.13.0).
