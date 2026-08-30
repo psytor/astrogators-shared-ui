@@ -169,8 +169,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
     setUser(null);
     setAllyCodes([]);
     setSelectedAllyCodeState(null);
+    // Drop the *persisted* selection too. It lives in a single browser-global
+    // key, so leaving it behind lets one account's ally code leak into the
+    // next login on the same (e.g. shared) browser. The saved ally-code
+    // *list* is kept intact for anonymous use.
+    setSelectedAllyCode(null);
     setMigrationPrompt({ show: false, localStorageCodes: [] });
-    // Note: We keep localStorage codes intact for anonymous use
   };
 
   const refreshUser = async () => {
@@ -221,10 +225,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
     setIsLoadingAllyCodes(true);
 
     try {
+      let availableCodes: string[] = [];
+
       if (user) {
         // Logged-in user: fetch from API
         const response = await apiClient.get<AllyCodeListResponse>('/api/v1/users/me/ally-codes');
         setAllyCodes(response.ally_codes);
+        availableCodes = response.ally_codes.map(c => c.ally_code);
 
         // Check for localStorage codes to migrate
         const localCodes = getAllyCodesFromStorage();
@@ -238,11 +245,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, apiBaseUrl
         // Anonymous user: use localStorage
         const localCodes = getAllyCodesFromStorage();
         setAllyCodes(localCodes);
+        availableCodes = localCodes.map(c => c.ally_code);
       }
 
-      // Restore selected ally code
-      const selected = getSelectedAllyCode();
-      setSelectedAllyCodeState(selected);
+      // Restore the persisted selection, but only if it still belongs to the
+      // current identity. The selection is kept in a single browser-global
+      // localStorage key that is not scoped per user, so after an account
+      // switch (or logout followed by a different login, common on a shared
+      // computer) it can point at an ally code the now-current user does not
+      // own. Blindly restoring it made the NavBar, roster syncs and mod
+      // queries all run against the previous account's player. Fall back to
+      // no selection and rewrite the key so the stale value can't come back.
+      const persisted = getSelectedAllyCode();
+      const restored = persisted && availableCodes.includes(persisted) ? persisted : null;
+      setSelectedAllyCodeState(restored);
+      if (restored !== persisted) {
+        setSelectedAllyCode(restored);
+      }
     } catch (error) {
       console.error('Failed to fetch ally codes:', error);
       setAllyCodes([]);
