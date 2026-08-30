@@ -1,12 +1,12 @@
 .card {
   background-color: var(--card-background);
   border-radius: var(--radius-lg);
-  /* Falls back to transparent (no visible border) when no accent color is
-     set - --card-edge-color is only ever defined by the component when
-     showDiagonalBorders + diagonalBorderColor are both passed. Consumers
-     used to have to re-declare this exact rule locally (ModCard.module.css,
-     HomePage.css) just to get a border matching their own diagonal accent -
-     it belongs on the primitive so every consumer gets it for free. */
+  /* --card-edge-color paints the straight border; the Card component sets it
+     from the `edgeColor` prop, and ALWAYS sets it (to var(--color-border) by
+     default) on a chamfered card so the closed outline needs no local rule.
+     A plain non-chamfered card leaves it unset -> transparent, no border.
+     The same value colours the diagonal corner lines, so a chamfered card's
+     edges and corners can never drift apart. */
   border: 1px solid var(--card-edge-color, transparent);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }

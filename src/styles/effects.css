@@ -6,6 +6,25 @@
 /* ========== CHAMFERED BOXES ========== */
 
 /**
+ * --card-edge-color drives the ENTIRE chamfered outline: Card's straight-side
+ * border and the diagonal corner lines both read this one value, so corners
+ * and sides can never render different colours.
+ *
+ * Registered as `inherits: false` on purpose. It is set as an inline style on
+ * a Card's root <div>; without this registration it would cascade down and
+ * every nested Card / element would silently pick up its ancestor's edge
+ * colour as a plain rectangular border (consumers were scattering
+ * `--card-edge-color: transparent` resets to fight exactly that). With the
+ * registration, an element that never sets it resolves to the initial value
+ * (transparent = no visible edge), not the parent's colour.
+ */
+@property --card-edge-color {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+/**
  * Chamfered Box - parametric
  *
  * One clip-path drives every size. Each size class only sets two locals:

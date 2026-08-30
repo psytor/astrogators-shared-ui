@@ -8,8 +8,19 @@ export interface CardProps {
   chamferSize?: 'sm' | 'md' | 'lg' | 'asymmetric';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   hoverable?: boolean;
+  /**
+   * Colour of the whole chamfered outline. The straight-side border AND the
+   * diagonal corner lines both take this one value, so corners and sides can
+   * never render different colours. Defaults to `var(--color-border)` on a
+   * chamfered card, so a chamfered card always has a visible closed edge
+   * without the consumer re-declaring a local `border` rule.
+   */
+  edgeColor?: string;
+  /**
+   * Draw the 45deg lines across the chamfered corner cuts. They always use
+   * `edgeColor` — they never carry a colour of their own.
+   */
   showDiagonalBorders?: boolean;
-  diagonalBorderColor?: string;
   className?: string;
   onClick?: () => void;
   style?: React.CSSProperties;
@@ -27,7 +38,7 @@ export const Card: React.FC<CardProps> = ({
   padding = 'md',
   hoverable = false,
   showDiagonalBorders = false,
-  diagonalBorderColor,
+  edgeColor,
   className = '',
   onClick,
   style,
@@ -42,10 +53,16 @@ export const Card: React.FC<CardProps> = ({
       : 'chamfered-box'
     : '';
 
-  const accent = showDiagonalBorders ? diagonalBorderColor : undefined;
-  const borderStyle = accent ? { color: accent } : undefined;
-  const rootStyle = accent
-    ? ({ ...style, ['--card-edge-color']: accent } as React.CSSProperties)
+  // One colour drives the whole outline. A chamfered card always resolves an
+  // edge colour (the prop, or the border token) so its straight edge is never
+  // invisible; the diagonal corner lines below read the very same value.
+  const resolvedEdgeColor =
+    edgeColor ?? (chamfered ? 'var(--color-border)' : undefined);
+  const lineStyle = resolvedEdgeColor
+    ? ({ color: resolvedEdgeColor } as React.CSSProperties)
+    : undefined;
+  const rootStyle = resolvedEdgeColor
+    ? ({ ...style, ['--card-edge-color']: resolvedEdgeColor } as React.CSSProperties)
     : style;
 
   return (
@@ -58,13 +75,14 @@ export const Card: React.FC<CardProps> = ({
       tabIndex={onClick ? 0 : undefined}
       style={rootStyle}
     >
-      {/* Diagonal corner borders (optional) */}
+      {/* Diagonal corner lines (optional) — colour comes from resolvedEdgeColor,
+          the same value that paints the straight border. */}
       {showDiagonalBorders && (
         <>
-          <div className="chamfered-diagonal-border chamfered-diagonal-tl" style={borderStyle} />
-          <div className="chamfered-diagonal-border chamfered-diagonal-tr" style={borderStyle} />
-          <div className="chamfered-diagonal-border chamfered-diagonal-bl" style={borderStyle} />
-          <div className="chamfered-diagonal-border chamfered-diagonal-br" style={borderStyle} />
+          <div className="chamfered-diagonal-border chamfered-diagonal-tl" style={lineStyle} />
+          <div className="chamfered-diagonal-border chamfered-diagonal-tr" style={lineStyle} />
+          <div className="chamfered-diagonal-border chamfered-diagonal-bl" style={lineStyle} />
+          <div className="chamfered-diagonal-border chamfered-diagonal-br" style={lineStyle} />
         </>
       )}
       {children}

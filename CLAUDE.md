@@ -10,8 +10,9 @@ unscoped package `astrogators-shared-ui` on the public **npmjs.org** registry
 (the git repo is hosted on GitHub, but the package is *not* on GitHub
 Packages). It is consumed by the workspace's frontends (`astrogators-hub`,
 `mod-ledger-ui`, `nightwatcher-ui`, `navicharts-ui`) — there is no app shell,
-no router, and no `index.html` runtime here. Current published version is 0.10.4 — every
-consumer is bumped to it together, never left on a mismatched version.
+no router, and no `index.html` runtime here. Current version is 0.12.0 (the
+chamfered-`Card` `edgeColor` rework — publish pending) — every consumer is
+bumped to it together, never left on a mismatched version.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
@@ -69,11 +70,19 @@ the chamfered-box utility classes live in `src/styles/`.
 
 - **Components** (`src/components/{layout,forms,display,feedback}`) — presentational
   React components. The "chamfered box" sci-fi cut-corner effect is a design
-  system primitive (`.chamfered-box[-sm|-lg]` and `Card chamfered`). `Card`
-  with `showDiagonalBorders` + `diagonalBorderColor` now also draws a real
-  1px border around the whole card in that color for free (`--card-edge-color`,
-  falls back to transparent) — consumers no longer need a local
-  `border: 1px solid ...` rule to get a visible edge on an accented card.
+  system primitive (`.chamfered-box[-sm|-lg]` and `Card chamfered`). A
+  chamfered `Card` owns its **entire** outline from **one** prop, `edgeColor`
+  (0.12.0, renamed from `diagonalBorderColor`): the straight-side border and
+  the diagonal corner lines both read that single value via
+  `--card-edge-color`, so corners and sides can never render different colours.
+  `edgeColor` is independent of `showDiagonalBorders` (which now only toggles
+  whether the corner lines are drawn — it carries no colour), and a chamfered
+  card with no `edgeColor` still gets a visible closed edge by defaulting to
+  `var(--color-border)`. Consumers must NOT re-declare a local `border` rule on
+  a chamfered Card — that reintroduces the two-colour drift this primitive
+  exists to prevent. `--card-edge-color` is registered `@property inherits:
+  false` (`src/styles/effects.css`) so a nested card never inherits an
+  ancestor's edge colour.
 - **`NavBar`** (`src/components/layout/NavBar.tsx`, built on the dumb `TopBar`
   primitive) — the suite-wide top bar standard; see `../CLAUDE.md`'s NavBar
   note. Router-agnostic (no react-router dep): consumers pass `NavItem[]`
