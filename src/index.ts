@@ -11,8 +11,8 @@ export { Container, TopBar, NavBar, Footer } from './components/layout';
 export type { ContainerProps, TopBarProps, NavBarProps, NavItem, FooterProps } from './components/layout';
 
 // Form Components
-export { Button, Input, Select, AllyCodeDropdown } from './components/forms';
-export type { ButtonProps, InputProps, SelectProps, SelectOption, AllyCodeDropdownProps } from './components/forms';
+export { Button, Input, Select, AllyCodeDropdown, RosterRefresh } from './components/forms';
+export type { ButtonProps, InputProps, SelectProps, SelectOption, AllyCodeDropdownProps, RosterRefreshProps } from './components/forms';
 
 // Display Components
 export { Card, Badge, Modal } from './components/display';
@@ -64,6 +64,7 @@ export type { StoredAllyCode } from './services/allyCodeStorage';
 
 // Utils
 export { formatAllyCode, unformatAllyCode } from './utils/formatAllyCode';
+export { parseBackendTimestamp, formatRelativeTime, formatCountdown } from './utils/formatTime';
 
 // Types
 export type {

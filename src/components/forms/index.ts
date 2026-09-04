@@ -9,3 +9,6 @@ export type { SelectProps, SelectOption } from './Select';
 
 export { AllyCodeDropdown } from './AllyCodeDropdown';
 export type { AllyCodeDropdownProps } from './AllyCodeDropdown';
+
+export { RosterRefresh } from './RosterRefresh';
+export type { RosterRefreshProps } from './RosterRefresh';
