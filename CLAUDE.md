@@ -10,9 +10,10 @@ unscoped package `astrogators-shared-ui` on the public **npmjs.org** registry
 (the git repo is hosted on GitHub, but the package is *not* on GitHub
 Packages). It is consumed by the workspace's frontends (`astrogators-hub`,
 `mod-ledger-ui`, `nightwatcher-ui`, `navicharts-ui`) — there is no app shell,
-no router, and no `index.html` runtime here. Current version is 0.13.0 (a
-chamfered `Card` now draws its corner lines by default — publish pending) —
-every consumer is bumped to it together, never left on a mismatched version.
+no router, and no `index.html` runtime here. Current version is 0.15.0
+(`authedFetch` now retries transient unavailability — 502/503/504, dropped
+connections — with a deliberately narrow policy; publish pending) — every
+consumer is bumped to it together, never left on a mismatched version.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
@@ -120,6 +121,14 @@ the chamfered-box utility classes live in `src/styles/`.
   is the **prefixed** backend URL (e.g.
   `http://localhost:8000/astrogators-table`) per the workspace
   `SERVICE_PREFIX` convention — this library should never assume a bare host.
+  Since 0.15.0 `authedFetch` also retries **transient unavailability**
+  (`fetchWithRetry`): a `502/503/504` response or a thrown `fetch`, backoff
+  `[700, 1500]ms`. The policy is deliberately narrow — a non-idempotent
+  request (POST/PATCH/PUT/DELETE) is retried **only** when `fetch` threw (no
+  response, so nothing mutated); a non-idempotent request that got a 5xx
+  *response* is handed back untouched. This exists so a save that straddles a
+  deploy container-swap still lands; it does not replace per-form "keep the
+  unsaved edit and let the user retry" handling in the apps.
 - **Ally-code storage** (`src/services/allyCodeStorage.ts`,
   `AllyCodeDropdown`, `formatAllyCode`) — SWGOH-specific 9-digit player ID
   management persisted in `localStorage`. `AllyCodeDropdown` always renders

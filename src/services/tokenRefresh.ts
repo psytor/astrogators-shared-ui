@@ -80,6 +80,69 @@ export const refreshAccessToken = (): Promise<string> => {
 // endpoints too, since it doesn't depend on the resource server's response.
 const EXPIRY_SKEW_SECONDS = 30;
 
+// ── transient-unavailability retry ──────────────────────────────────────────
+// A backend container swapped mid-deploy, a 502/503/504 from nginx, a dropped
+// connection — all recover in a few seconds. Retry those a couple of times so a
+// request that straddles the swap window still lands, instead of surfacing the
+// blip to the user. One backoff entry per retry; its length is the retry count.
+const RETRY_BACKOFF_MS = [700, 1500];
+const RETRY_STATUSES = new Set([502, 503, 504]);
+
+const isIdempotentMethod = (method?: string): boolean => {
+  const m = (method ?? 'GET').toUpperCase();
+  return m === 'GET' || m === 'HEAD' || m === 'OPTIONS';
+};
+
+// Only a string (or absent) body can be re-sent for a second attempt; a
+// stream/FormData/Blob may already be consumed. Our services all send JSON
+// strings, so this is permissive enough in practice and safe otherwise.
+const bodyIsReplayable = (body: BodyInit | null | undefined): boolean =>
+  body == null || typeof body === 'string';
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * `fetch` plus a short, deliberately narrow retry for transient
+ * unavailability. NOT a general retry policy:
+ *
+ * - A request that never got a response (`fetch` threw — connection refused,
+ *   reset, offline) is retried for ANY method: nothing reached the server, so
+ *   nothing can have mutated.
+ * - A `502/503/504` *response* is retried only for idempotent methods
+ *   (GET/HEAD/OPTIONS). For a POST/PATCH/PUT/DELETE the reverse proxy can't
+ *   promise the write didn't land, so the response is handed straight back and
+ *   the caller (and the user) decide what to do with it.
+ */
+const fetchWithRetry = async (
+  input: string,
+  init: RequestInit
+): Promise<Response> => {
+  const retryAfterResponse =
+    isIdempotentMethod(init.method) && bodyIsReplayable(init.body);
+  const retryAfterThrow = bodyIsReplayable(init.body);
+
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= RETRY_BACKOFF_MS.length; attempt++) {
+    if (attempt > 0) await sleep(RETRY_BACKOFF_MS[attempt - 1]);
+    const canRetry = attempt < RETRY_BACKOFF_MS.length;
+    try {
+      const response = await fetch(input, init);
+      if (canRetry && retryAfterResponse && RETRY_STATUSES.has(response.status)) {
+        continue;
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (canRetry && retryAfterThrow) continue;
+      throw error;
+    }
+  }
+  // Unreachable: the final iteration never `continue`s (canRetry is false), it
+  // always returns or throws. TS just can't see the loop is exhaustive.
+  throw lastError ?? new Error('fetchWithRetry: retries exhausted');
+};
+
 const isExpiredOrExpiringSoon = (token: string): boolean => {
   try {
     const payload = token.split('.')[1];
@@ -101,6 +164,11 @@ const isExpiredOrExpiringSoon = (token: string): boolean => {
  * full control over status handling (mirrors the raw `fetch` contract). When a
  * refresh is needed but fails (e.g. the refresh token is also expired), the
  * original 401 Response is returned so the caller can surface a re-login state.
+ *
+ * Transient unavailability (a backend swapped mid-deploy, a 502/503/504, a
+ * dropped connection) is retried a couple of times — see `fetchWithRetry` for
+ * the exact, deliberately-narrow policy (non-idempotent writes are only
+ * retried when no response was ever received).
  *
  * Works against ANY resource URL; only the refresh hop uses the configured
  * auth base URL.
@@ -128,7 +196,7 @@ export const authedFetch = async (
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(input, { ...init, headers });
+  const response = await fetchWithRetry(input, { ...init, headers });
 
   // Only attempt refresh when we actually sent a token — a 401 on an
   // anonymous request is a genuine authorization error, not an expiry.
@@ -139,7 +207,7 @@ export const authedFetch = async (
   try {
     const newToken = await refreshAccessToken();
     headers['Authorization'] = `Bearer ${newToken}`;
-    return await fetch(input, { ...init, headers });
+    return await fetchWithRetry(input, { ...init, headers });
   } catch {
     // Refresh failed — hand back the original 401 for the caller to react to.
     return response;
