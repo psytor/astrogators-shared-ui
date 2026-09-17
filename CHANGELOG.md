@@ -12,15 +12,21 @@ imprecise.
 ## [0.16.1] — 2026-09-17
 
 ### Changed
-- `SUITE_NAV`: Mod Ledger's `evaluations` entry splits into `my-evaluations`
-  and `protocols` (its `EvaluationsPage` already stacked these as two
-  collections; they're now real, separately-addressable destinations).
-  Navicharts' single `library` entry splits into `mine`, `curated`, `guild`,
-  `bookmarked`, and `moderation` (renamed from the app's internal "All
-  Shared" label, for naming parity with Mod Ledger's identically-gated,
-  identically-purposed entry — both are "admin/mod browses every user's
-  shared content"). No `NavBar`/`NavMenu`/`MobileNavPanel` code changes —
-  content-only manifest update.
+- `SUITE_NAV`: `grid` renamed to **Inventory** (Mod Ledger). Mod Ledger's
+  `evaluations` entry gains a second, same-page entry — `my-evaluations`
+  (bare `/mod-ledger/evaluations`) and `official` (`#official`) — both
+  landing on the same `EvaluationsPage`, which stacks both collections as
+  it always did; the two entries are anchors to jump between them, not
+  separate destinations. "Protocols" is renamed **Official** on-page too.
+  Navicharts' single `library` entry gains four same-page anchor entries —
+  `mine` (bare `/navicharts/`), `official` (`#official`, was "Curated"),
+  `guild` (`#guild`), `bookmarked` (`#bookmarked`) — plus a `moderation`
+  entry (`#moderation`, `roles: ['admin', 'mod']`) pointing at the same
+  page's existing "All Shared" section, which stays embedded there (it was
+  never a separate route, unlike Mod Ledger's genuinely-separate
+  `/moderation`). No `NavBar`/`NavMenu`/`MobileNavPanel` code changes —
+  content-only manifest update; both apps' pages handle the anchor
+  scrolling themselves.
 
 ## [0.16.0] — 2026-09-17
 

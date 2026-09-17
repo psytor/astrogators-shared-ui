@@ -36,9 +36,9 @@ export const SUITE_NAV: SuiteNavApp[] = [
     href: '/mod-ledger/',
     status: 'available',
     sections: [
-      { id: 'grid', label: 'Grid', href: '/mod-ledger/' },
+      { id: 'grid', label: 'Inventory', href: '/mod-ledger/' },
       { id: 'my-evaluations', label: 'My Evaluations', href: '/mod-ledger/evaluations' },
-      { id: 'protocols', label: 'Protocols', href: '/mod-ledger/evaluations?tab=protocols' },
+      { id: 'official', label: 'Official', href: '/mod-ledger/evaluations#official' },
       {
         id: 'moderation',
         label: 'Moderation',
@@ -53,14 +53,14 @@ export const SUITE_NAV: SuiteNavApp[] = [
     href: '/navicharts/',
     status: 'available',
     sections: [
-      { id: 'mine', label: 'My Star Charts', href: '/navicharts/' },
-      { id: 'curated', label: 'Curated', href: '/navicharts/?group=curated' },
-      { id: 'guild', label: 'Guild', href: '/navicharts/?group=guild' },
-      { id: 'bookmarked', label: 'Bookmarked', href: '/navicharts/?group=bookmarked' },
+      { id: 'mine', label: 'Mine', href: '/navicharts/' },
+      { id: 'official', label: 'Official', href: '/navicharts/#official' },
+      { id: 'guild', label: 'Guild', href: '/navicharts/#guild' },
+      { id: 'bookmarked', label: 'Bookmarked', href: '/navicharts/#bookmarked' },
       {
         id: 'moderation',
-        label: 'Moderation',
-        href: '/navicharts/?group=moderation',
+        label: 'All Shared',
+        href: '/navicharts/#moderation',
         roles: ['admin', 'mod'],
       },
     ],
