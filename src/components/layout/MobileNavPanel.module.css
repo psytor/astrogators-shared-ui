@@ -88,6 +88,27 @@
   font-size: var(--font-size-sm);
 }
 
+.group:not(:last-child) {
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.groupLabel {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.groupItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.groupItem {
+  padding-left: calc(var(--spacing-md) + var(--spacing-lg));
+  font-size: var(--font-size-xs);
+}
+
 .allySection,
 .extrasSection,
 .accountSection {

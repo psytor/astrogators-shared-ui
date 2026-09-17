@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { SUITE_NAV, SuiteAppId, SuiteNavSection } from '../../navigation/suiteNav';
+import { SUITE_NAV, SuiteAppId, SuiteNavLink, isSuiteNavGroup } from '../../navigation/suiteNav';
 import { AllyCodeDropdown } from '../forms/AllyCodeDropdown';
 import { AccountCluster } from './AccountCluster';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,7 +11,7 @@ export interface MobileNavPanelProps {
   onClose: () => void;
   currentApp: SuiteAppId;
   activeSectionId?: string;
-  onSectionClick?: (section: SuiteNavSection, event: React.MouseEvent<HTMLAnchorElement>) => void;
+  onSectionClick?: (section: SuiteNavLink, event: React.MouseEvent<HTMLAnchorElement>) => void;
   rightExtras?: React.ReactNode;
   showAuth?: boolean;
   panelId: string;
@@ -78,10 +78,10 @@ export const MobileNavPanel: React.FC<MobileNavPanelProps> = ({
   if (!isOpen) return null;
 
   const handleSectionClick =
-    (appId: SuiteAppId, section: SuiteNavSection) =>
+    (appId: SuiteAppId, link: SuiteNavLink) =>
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       if (appId === currentApp) {
-        onSectionClick?.(section, event);
+        onSectionClick?.(link, event);
       }
       onClose();
     };
@@ -102,12 +102,29 @@ export const MobileNavPanel: React.FC<MobileNavPanelProps> = ({
           {SUITE_NAV.map((app) => {
             const isExpanded = expandedApp === app.id;
             const isCurrentApp = currentApp === app.id;
-            const visibleSections = app.sections.filter((section) => {
-              if (section.requiresAuth && !isAuthenticated) return false;
-              if (section.roles && (!user || !section.roles.includes(user.role))) return false;
+            const isVisible = (link: SuiteNavLink) => {
+              if (link.requiresAuth && !isAuthenticated) return false;
+              if (link.roles && (!user || !link.roles.includes(user.role))) return false;
               return true;
-            });
+            };
             const accordionPanelId = `mobile-accordion-${app.id}`;
+
+            const renderLink = (link: SuiteNavLink, extraClassName?: string) => {
+              const isActiveSection = isCurrentApp && activeSectionId === link.id;
+              return (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  className={`${styles.sectionLink} ${extraClassName ?? ''} ${
+                    isActiveSection ? styles.sectionActive : ''
+                  }`}
+                  aria-current={isActiveSection ? 'page' : undefined}
+                  onClick={handleSectionClick(app.id, link)}
+                >
+                  {link.label}
+                </a>
+              );
+            };
 
             return (
               <div key={app.id} className={styles.accordionItem}>
@@ -141,20 +158,18 @@ export const MobileNavPanel: React.FC<MobileNavPanelProps> = ({
                     {app.status === 'coming-soon' ? (
                       <div className={styles.comingSoon}>Coming soon</div>
                     ) : (
-                      visibleSections.map((section) => {
-                        const isActiveSection = isCurrentApp && activeSectionId === section.id;
+                      app.sections.map((entry) => {
+                        if (!isSuiteNavGroup(entry)) {
+                          return isVisible(entry) ? renderLink(entry) : null;
+                        }
+                        const visibleItems = entry.items.filter(isVisible);
                         return (
-                          <a
-                            key={section.id}
-                            href={section.href}
-                            className={`${styles.sectionLink} ${
-                              isActiveSection ? styles.sectionActive : ''
-                            }`}
-                            aria-current={isActiveSection ? 'page' : undefined}
-                            onClick={handleSectionClick(app.id, section)}
-                          >
-                            {section.label}
-                          </a>
+                          <div key={entry.id} className={styles.group}>
+                            {renderLink(entry, styles.groupLabel)}
+                            <div className={styles.groupItems}>
+                              {visibleItems.map((item) => renderLink(item, styles.groupItem))}
+                            </div>
+                          </div>
                         );
                       })
                     )}
