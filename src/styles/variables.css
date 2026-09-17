@@ -111,6 +111,9 @@
   --z-base: 0;
   --z-dropdown: 100;
   --z-sticky: 200;
+  /* Portalled to document.body, so it sits outside the sticky header's own
+     stacking context and needs its own tier above it, below modals. */
+  --z-nav-mobile-panel: 250;
   --z-modal: 300;
   --z-toast: 400;
   --z-tooltip: 500;

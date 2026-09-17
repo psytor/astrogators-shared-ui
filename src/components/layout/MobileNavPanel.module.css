@@ -1,0 +1,96 @@
+.backdrop {
+  position: fixed;
+  top: var(--topbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-nav-mobile-panel);
+}
+
+.panel {
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: var(--topbar-background);
+  border-bottom: 1px solid var(--topbar-border);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+}
+
+.accordionItem {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.accordionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-md) 0;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  text-align: left;
+}
+
+.currentApp {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.accordionPanel {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-sm);
+}
+
+.sectionLink {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+}
+
+.sectionLink:hover {
+  color: var(--color-text-primary);
+}
+
+.sectionActive {
+  color: var(--color-primary);
+  background: var(--color-background-hover);
+  border-radius: var(--radius-sm);
+}
+
+.comingSoon {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-sm);
+}
+
+.allySection,
+.extrasSection,
+.accountSection {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}

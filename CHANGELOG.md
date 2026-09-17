@@ -9,6 +9,36 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.16.0]
+
+### Changed
+- **Breaking:** `NavBar` no longer takes `appName`, `appHref`, `navItems`,
+  `hubUrl`, or `showAllyCode` — the bar's contents now come from one place,
+  the new `SUITE_NAV` manifest (`src/navigation/suiteNav.ts`, exported from
+  the package root), so every app renders the identical bar with only the
+  active trigger/section differing. New props: `currentApp`,
+  `activeSectionId`, `onNavigate`. The logo always targets `/`. The
+  ally-code dropdown is now always shown (no more opt-out). `NavItem` is
+  removed; `TopBar` (the dumb primitive underneath) drops its max-width so
+  the bar is full-bleed edge-to-edge in every consumer.
+- `NavBar` gains a mobile burger + full-panel accordion menu below the
+  existing 768px breakpoint (previously mobile just reflowed the desktop
+  tab strip).
+- `AllyCodeDropdown` gains `isOpen`/`onOpenChange` (controlled, so `NavBar`
+  can enforce "only one popover open at a time" across the whole bar) and a
+  `variant: 'floating' | 'inline'` prop for nesting inside the new mobile
+  panel without a clipped floating popover. Both are optional; omitting them
+  keeps the previous self-managed behavior.
+- New `--z-nav-mobile-panel: 250` design token, between `--z-sticky: 200`
+  and `--z-modal: 300`, for the portalled mobile panel.
+
+### Fixed
+- `AllyCodeDropdown`'s manage panel now uses `var(--z-dropdown)` instead of
+  a hardcoded `z-index: 1000`.
+
+_Note: this changelog had drifted — 0.11.0 through 0.15.0 shipped without
+entries here. Not backfilled; this entry starts current tracking again._
+
 ## [0.10.4] — 2026-08-19
 
 ### Fixed

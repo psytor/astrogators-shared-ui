@@ -5,79 +5,32 @@
   text-decoration: none;
 }
 
-/* App identity + section tabs, sitting just right of the logo. */
-.appNav {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg, 1.5rem);
-}
-
-.appName {
-  font-family: var(--font-heading);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.appName:hover {
-  color: var(--color-primary);
-}
-
-/* Section tab strip. */
-.tabs {
+/* Per-app dropdown triggers, sitting just right of the logo. Hidden below
+   the mobile breakpoint — the burger takes over navigation there. */
+.appMenus {
   display: flex;
   align-items: center;
   gap: var(--spacing-lg, 1.5rem);
   height: var(--topbar-height);
 }
 
-/* Each tab is plain text with an accent underline on the active one. The
-   transparent bottom border on every tab keeps the baseline from shifting when
-   the active state appears. */
-.tab {
+/* rightExtras + ally dropdown + account cluster. Hidden below the mobile
+   breakpoint — all of it moves into MobileNavPanel instead. */
+.desktopRight {
   display: flex;
   align-items: center;
-  height: 100%;
-  padding: 0 var(--spacing-xs, 0.25rem);
-  border-bottom: 2px solid transparent;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-base);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  gap: var(--spacing-md);
 }
 
-.tab:hover {
-  color: var(--color-text-primary);
-}
-
-.tabActive {
-  color: var(--color-text-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-/* App-specific controls (e.g. a refresh button + "updated X ago" label) hug the
-   ally dropdown with a tight gap; TopBar's .right supplies the normal gap to the
-   auth cluster. */
 .extrasGroup {
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-.authCluster {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.userLink {
-  color: var(--color-text-secondary);
-  text-decoration: none;
-}
-
-.userLink:hover {
-  color: var(--color-text-primary);
+@media (max-width: 768px) {
+  .appMenus,
+  .desktopRight {
+    display: none;
+  }
 }

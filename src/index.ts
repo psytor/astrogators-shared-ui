@@ -8,7 +8,13 @@ import './styles/global.css';
 
 // Layout Components
 export { Container, TopBar, NavBar, Footer } from './components/layout';
-export type { ContainerProps, TopBarProps, NavBarProps, NavItem, FooterProps } from './components/layout';
+export type { ContainerProps, TopBarProps, NavBarProps, FooterProps } from './components/layout';
+
+// Suite navigation manifest — the single source of truth for NavBar's
+// contents. Consumers pass `currentApp` to NavBar; they don't build their
+// own nav structure.
+export { SUITE_NAV } from './navigation/suiteNav';
+export type { SuiteAppId, SuiteNavApp, SuiteNavSection } from './navigation/suiteNav';
 
 // Form Components
 export { Button, Input, Select, AllyCodeDropdown, RosterRefresh } from './components/forms';
