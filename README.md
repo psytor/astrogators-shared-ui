@@ -67,13 +67,31 @@ All components are styled via CSS Modules and the global design tokens in
 
 ### Layout
 
-```tsx
-import { TopBar, Container, Footer } from 'astrogators-shared-ui';
+`NavBar` is the suite-wide top bar — every app renders it, unmodified, with
+no per-app name/tabs/logo of its own. Its contents come from the exported
+`SUITE_NAV` manifest, not from props:
 
-<TopBar logo={<Logo />} rightContent={<UserMenu />} />
+```tsx
+import { NavBar, Container, Footer } from 'astrogators-shared-ui';
+
+<NavBar
+  currentApp="mod-ledger"
+  activeSectionId="evaluations"
+  onNavigate={(section, event) => {
+    // fires only for sections belonging to currentApp; cross-app links are
+    // always full page loads. Call event.preventDefault() to soft-navigate
+    // with your own router instead.
+    event.preventDefault();
+    navigate(section.href.replace('/mod-ledger', ''));
+  }}
+  rightExtras={<RosterRefresh lastSynced={lastSynced} onRefresh={sync} />}
+/>
 <Container maxWidth="lg" padding>{children}</Container>
 <Footer />
 ```
+
+`TopBar` underneath is the dumb, unstyled-by-apps primitive — consumers
+render `NavBar`, not `TopBar`, directly.
 
 ### Forms
 

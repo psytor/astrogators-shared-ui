@@ -23,8 +23,8 @@
   padding: 1rem;
   margin-top: 0.5rem;
   min-width: 300px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  z-index: var(--z-dropdown);
 }
 
 .managePanel h4 {
@@ -98,4 +98,27 @@
     right: auto;
     left: 0;
   }
+}
+
+/* `variant="inline"` (MobileNavPanel only): the panel's own scroll container
+   makes a floating, absolutely-positioned popover unsafe — it can get
+   clipped by an ancestor's `overflow`. Render the manage form as a plain
+   block in normal flow instead. */
+.inline {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+}
+
+.inline .select {
+  min-width: 0;
+  width: 100%;
+}
+
+.inline .managePanel {
+  position: static;
+  margin-top: 0;
+  min-width: 0;
+  width: 100%;
+  box-shadow: none;
 }

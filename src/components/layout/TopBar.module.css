@@ -10,10 +10,12 @@
   backdrop-filter: blur(10px);
 }
 
+/* Full-bleed: the bar spans the full viewport width in every consumer, so the
+   logo/menus never shift horizontally between apps regardless of the page
+   body's own column width below it. No max-width here, ever — see NavBar's
+   doc comment. */
 .content {
   height: 100%;
-  max-width: var(--container-max-width);
-  margin: 0 auto;
   padding: 0 var(--container-padding);
   display: flex;
   align-items: center;

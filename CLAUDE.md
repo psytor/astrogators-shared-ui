@@ -10,14 +10,13 @@ unscoped package `astrogators-shared-ui` on the public **npmjs.org** registry
 (the git repo is hosted on GitHub, but the package is *not* on GitHub
 Packages). It is consumed by the workspace's frontends (`astrogators-hub`,
 `mod-ledger-ui`, `nightwatcher-ui`, `navicharts-ui`) — there is no app shell,
-no router, and no `index.html` runtime here. Current version is 0.15.0
-(`authedFetch` now retries transient unavailability — 502/503/504, dropped
-connections — with a deliberately narrow policy; publish pending) — every
-consumer is bumped to it together, never left on a mismatched version.
+no router, and no `index.html` runtime here.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
-see `../CLAUDE.md`.
+see `../CLAUDE.md`. Current version is 0.16.0 — `NavBar` was rewritten to be
+built from one manifest (`SUITE_NAV`) instead of per-app props, so the bar is
+identical in every consumer; every app must bump to 0.16.0+ together.
 
 ## Common commands
 
@@ -88,14 +87,35 @@ the chamfered-box utility classes live in `src/styles/`.
   card never inherits an ancestor's edge colour.
 - **`NavBar`** (`src/components/layout/NavBar.tsx`, built on the dumb `TopBar`
   primitive) — the suite-wide top bar standard; see `../CLAUDE.md`'s NavBar
-  note. Router-agnostic (no react-router dep): consumers pass `NavItem[]`
-  with their own `active` state and an optional `render` prop for a router
-  `<Link>`; without `render` a tab is a plain `<a href>`. Bakes the
-  username/login/register/logout cluster via `useAuth` (`showAuth`, default
-  true) and the shared `AllyCodeDropdown` (`showAllyCode`, default false) —
-  apps consume `NavBar`, they don't hand-compose `TopBar` themselves. Auth
-  links (`/login`, `/register`, `/profile`) are plain anchors to the hub
-  origin since auth UI lives in the hub and everything is single-origin.
+  note. Since 0.16.0, its contents come from exactly one source: the
+  `SUITE_NAV` manifest (`src/navigation/suiteNav.ts`, exported from the
+  package root), not from per-app props. `NavBarProps` is just
+  `currentApp` (which trigger is highlighted), `activeSectionId` (which of
+  that app's own sections is active — supplied by the consumer, since apps
+  detect "where am I" differently and some have no router at all),
+  `onNavigate` (fires only for sections belonging to `currentApp`; cross-app
+  links are always real `<a href>` full page loads), `rightExtras` (the one
+  per-app slot, for `RosterRefresh` only, always in the same position),
+  `showAuth` (default true), and `className` (non-layout hooks only — it
+  cannot change the bar's width/height/padding/item positions). There is no
+  `appName`, `navItems`, `hubUrl`, or `showAllyCode` — the logo always
+  targets `/`, and the ally-code dropdown is always shown. **This is
+  deliberate, not an oversight**: per-app configurability of the bar is what
+  caused it to look different in every app before 0.16.0, so the capability
+  was removed, not just left unused. If a future app needs something the
+  manifest can't express, grow `SuiteNavApp`/`SuiteNavSection`'s shape — an
+  app never gets a bypass prop instead. On desktop, each `SUITE_NAV` app
+  gets a dropdown trigger (disclosure pattern — Tab reaches its links
+  normally, arrow keys are an additive bonus); below the 768px breakpoint,
+  `NavBar` renders a burger instead, opening a `createPortal`-to-`body`
+  accordion panel (required, since `TopBar`'s `backdrop-filter` makes the
+  header a containing block that would otherwise clip a fixed panel
+  rendered inside it). Bakes the username/Admin-if-admin/Logout (or
+  Login/Sign Up) cluster via `useAuth` in `AccountCluster` — apps consume
+  `NavBar`, they don't hand-compose `TopBar` or the account cluster
+  themselves. Auth links (`/login`, `/register`, `/profile`, `/admin/users`)
+  are plain anchors to the hub origin since auth UI lives in the hub and
+  everything is single-origin.
 - **Auth** (`src/contexts/AuthContext.tsx`, `src/services/auth.ts`) — JWT access
   + refresh tokens stored in `localStorage`, exposed through `AuthProvider` /
   `useAuth`. This is the canonical auth surface for the whole frontend mesh; do
@@ -135,7 +155,13 @@ the chamfered-box utility classes live in `src/styles/`.
   its trigger button even with zero saved codes (labeled "+ Add ally code"
   instead of "Manage") — only the `Select` itself is conditional on having
   codes — so a user with no codes can still reach the add form instead of
-  the whole control disappearing.
+  the whole control disappearing. Since 0.16.0 its manage-panel open state
+  is controllable (`isOpen`/`onOpenChange`, optional — falls back to
+  self-managed state when omitted), which is how `NavBar` enforces "only one
+  popover open at a time" across the whole bar. `variant="inline"` (default
+  `"floating"`) renders the manage form as a plain block instead of an
+  absolutely-positioned popover — `NavBar`'s mobile panel uses this, since a
+  floating popover nested in its own scroll container would get clipped.
 - **Types** (`src/types/`) — request/response DTOs that mirror the backend
   contracts (`astrogators-table` for auth, `mod-ledger` for mods). `User`
   includes a `role` field (mirrors the backend, which has always returned

@@ -1,0 +1,25 @@
+.authCluster {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.userLink {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.userLink:hover {
+  color: var(--color-text-primary);
+}
+
+.adminLink {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.adminLink:hover {
+  color: var(--color-primary);
+}
