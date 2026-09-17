@@ -9,7 +9,7 @@ imprecise.
 
 ## [Unreleased]
 
-## [0.16.0]
+## [0.16.0] — 2026-09-17
 
 ### Changed
 - **Breaking:** `NavBar` no longer takes `appName`, `appHref`, `navItems`,
@@ -127,7 +127,8 @@ Input, Select, Card, Badge, Modal, Loader), `AuthProvider` / `useAuth`
 with transparent 401 refresh, shared CSS tokens and chamfered-box
 primitives. Pre-changelog; consult `git log` for finer detail.
 
-[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...HEAD
+[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...v0.16.0
 [0.10.4]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.1...v0.10.4
 [0.6.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.3.1...v0.6.1
 [0.3.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.3.0...v0.3.1
