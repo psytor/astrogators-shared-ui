@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { SuiteNavApp, SuiteNavSection } from '../../navigation/suiteNav';
+import { SuiteNavApp, SuiteNavLink, isSuiteNavGroup } from '../../navigation/suiteNav';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDismissableMenu } from '../../hooks/useDismissableMenu';
 import styles from './NavMenu.module.css';
@@ -10,14 +10,16 @@ export interface NavMenuProps {
   activeSectionId?: string;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSectionClick?: (section: SuiteNavSection, event: React.MouseEvent<HTMLAnchorElement>) => void;
+  onSectionClick?: (section: SuiteNavLink, event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 /**
  * One trigger + dropdown panel per SUITE_NAV app. Disclosure pattern, not
  * `role="menu"` — these are page links, so Tab moves through them like any
  * other link list; arrow keys are an additive convenience, not a
- * replacement for Tab.
+ * replacement for Tab. A group entry (e.g. "Evaluations") renders its own
+ * link plus its `items` nested and indented underneath — still all flat
+ * `<a>`s in Tab order, just visually grouped.
  */
 export const NavMenu: React.FC<NavMenuProps> = ({
   app,
@@ -39,19 +41,18 @@ export const NavMenu: React.FC<NavMenuProps> = ({
     panelRef,
   });
 
-  const visibleSections = app.sections.filter((section) => {
-    if (section.requiresAuth && !isAuthenticated) return false;
-    if (section.roles && (!user || !section.roles.includes(user.role))) return false;
+  const isVisible = (link: SuiteNavLink) => {
+    if (link.requiresAuth && !isAuthenticated) return false;
+    if (link.roles && (!user || !link.roles.includes(user.role))) return false;
     return true;
-  });
+  };
 
-  const handleSectionClick =
-    (section: SuiteNavSection) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-      if (isCurrentApp) {
-        onSectionClick?.(section, event);
-      }
-      onOpenChange(false);
-    };
+  const handleLinkClick = (link: SuiteNavLink) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isCurrentApp) {
+      onSectionClick?.(link, event);
+    }
+    onOpenChange(false);
+  };
 
   const handlePanelKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
@@ -64,6 +65,21 @@ export const NavMenu: React.FC<NavMenuProps> = ({
         ? (currentIndex + 1) % links.length
         : (currentIndex - 1 + links.length) % links.length;
     links[nextIndex]?.focus();
+  };
+
+  const renderLink = (link: SuiteNavLink, extraClassName?: string) => {
+    const isActiveSection = isCurrentApp && activeSectionId === link.id;
+    return (
+      <a
+        key={link.id}
+        href={link.href}
+        className={`${styles.sectionLink} ${extraClassName ?? ''} ${isActiveSection ? styles.sectionActive : ''}`}
+        aria-current={isActiveSection ? 'page' : undefined}
+        onClick={handleLinkClick(link)}
+      >
+        {link.label}
+      </a>
+    );
   };
 
   return (
@@ -96,18 +112,19 @@ export const NavMenu: React.FC<NavMenuProps> = ({
             <div className={styles.comingSoon}>Coming soon</div>
           ) : (
             <nav aria-label={`${app.label} sections`} onKeyDown={handlePanelKeyDown}>
-              {visibleSections.map((section) => {
-                const isActiveSection = isCurrentApp && activeSectionId === section.id;
+              {app.sections.map((entry) => {
+                if (!isSuiteNavGroup(entry)) {
+                  if (!isVisible(entry)) return null;
+                  return renderLink(entry);
+                }
+                const visibleItems = entry.items.filter(isVisible);
                 return (
-                  <a
-                    key={section.id}
-                    href={section.href}
-                    className={`${styles.sectionLink} ${isActiveSection ? styles.sectionActive : ''}`}
-                    aria-current={isActiveSection ? 'page' : undefined}
-                    onClick={handleSectionClick(section)}
-                  >
-                    {section.label}
-                  </a>
+                  <div key={entry.id} className={styles.group}>
+                    {renderLink(entry, styles.groupLabel)}
+                    <div className={styles.groupItems}>
+                      {visibleItems.map((item) => renderLink(item, styles.groupItem))}
+                    </div>
+                  </div>
                 );
               })}
             </nav>

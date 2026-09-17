@@ -5,7 +5,7 @@ import { NavBurger } from './NavBurger';
 import { MobileNavPanel } from './MobileNavPanel';
 import { AccountCluster } from './AccountCluster';
 import { AllyCodeDropdown } from '../forms/AllyCodeDropdown';
-import { SUITE_NAV, SuiteAppId, SuiteNavSection } from '../../navigation/suiteNav';
+import { SUITE_NAV, SuiteAppId, SuiteNavLink } from '../../navigation/suiteNav';
 import styles from './NavBar.module.css';
 
 export interface NavBarProps {
@@ -20,7 +20,7 @@ export interface NavBarProps {
    *  always real `<a href>` full page loads, never intercepted. Call
    *  `event.preventDefault()` to soft-navigate instead; the menu closes
    *  either way, since no page load will unmount it for you. */
-  onNavigate?: (section: SuiteNavSection, event: React.MouseEvent<HTMLAnchorElement>) => void;
+  onNavigate?: (section: SuiteNavLink, event: React.MouseEvent<HTMLAnchorElement>) => void;
   /** The one per-app element allowed in the bar: RosterRefresh. Always in
    *  the same slot, just left of the ally-code dropdown on desktop, and
    *  moves into the mobile panel on small screens. Its position never

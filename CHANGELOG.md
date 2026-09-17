@@ -9,6 +9,28 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.16.2] — 2026-09-17
+
+### Added
+- `SuiteNavGroup`: a `SuiteNavApp`'s `sections` array can now mix flat
+  `SuiteNavSection`s with `SuiteNavGroup`s (a labelled entry with its own
+  `href` plus nested `items`) — `NavMenu`/`MobileNavPanel` render a group's
+  own link followed by its items, indented, in both the desktop dropdown and
+  the mobile accordion. `NavBarProps.onNavigate` (and `AllyCodeDropdown`-
+  adjacent internals) now type against the shared `SuiteNavLink` base
+  (`{id, label, href, requiresAuth?, roles?}`) instead of `SuiteNavSection`
+  specifically, since a group's own link fires through the same callback.
+  New `isSuiteNavGroup()` type guard exported alongside the new types.
+- `SUITE_NAV`: Mod Ledger gains a top-level `overview` entry (was `grid` —
+  renamed, the page itself is unchanged) and its `evaluations` entries
+  (`my-evaluations`/`official`/`moderation`) now nest under a single
+  "Evaluations" group instead of sitting flat alongside `overview`.
+  Navicharts equivalently gains a top-level `overview` entry and nests
+  `mine`/`guild`/`official`/`bookmarked`/`moderation` under a "Star Charts"
+  group — hrefs move from the bare `/navicharts/` root to a new
+  `/navicharts/starcharts` page (see the navicharts-ui `0.x` release notes
+  for the routing change this depends on).
+
 ## [0.16.1] — 2026-09-17
 
 ### Changed
@@ -146,7 +168,8 @@ Input, Select, Card, Badge, Modal, Loader), `AuthProvider` / `useAuth`
 with transparent 401 refresh, shared CSS tokens and chamfered-box
 primitives. Pre-changelog; consult `git log` for finer detail.
 
-[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.1...HEAD
+[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.2...HEAD
+[0.16.2]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.1...v0.16.2
 [0.16.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...v0.16.0
 [0.10.4]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.1...v0.10.4
