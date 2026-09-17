@@ -9,6 +9,25 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.16.1] — 2026-09-17
+
+### Changed
+- `SUITE_NAV`: `grid` renamed to **Inventory** (Mod Ledger). Mod Ledger's
+  `evaluations` entry gains a second, same-page entry — `my-evaluations`
+  (bare `/mod-ledger/evaluations`) and `official` (`#official`) — both
+  landing on the same `EvaluationsPage`, which stacks both collections as
+  it always did; the two entries are anchors to jump between them, not
+  separate destinations. "Protocols" is renamed **Official** on-page too.
+  Navicharts' single `library` entry gains four same-page anchor entries —
+  `mine` (bare `/navicharts/`), `official` (`#official`, was "Curated"),
+  `guild` (`#guild`), `bookmarked` (`#bookmarked`) — plus a `moderation`
+  entry (`#moderation`, `roles: ['admin', 'mod']`) pointing at the same
+  page's existing "All Shared" section, which stays embedded there (it was
+  never a separate route, unlike Mod Ledger's genuinely-separate
+  `/moderation`). No `NavBar`/`NavMenu`/`MobileNavPanel` code changes —
+  content-only manifest update; both apps' pages handle the anchor
+  scrolling themselves.
+
 ## [0.16.0] — 2026-09-17
 
 ### Changed
@@ -127,7 +146,8 @@ Input, Select, Card, Badge, Modal, Loader), `AuthProvider` / `useAuth`
 with transparent 401 refresh, shared CSS tokens and chamfered-box
 primitives. Pre-changelog; consult `git log` for finer detail.
 
-[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.1...HEAD
+[0.16.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...v0.16.0
 [0.10.4]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.1...v0.10.4
 [0.6.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.3.1...v0.6.1

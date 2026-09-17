@@ -36,8 +36,9 @@ export const SUITE_NAV: SuiteNavApp[] = [
     href: '/mod-ledger/',
     status: 'available',
     sections: [
-      { id: 'grid', label: 'Grid', href: '/mod-ledger/' },
-      { id: 'evaluations', label: 'Evaluations', href: '/mod-ledger/evaluations' },
+      { id: 'grid', label: 'Inventory', href: '/mod-ledger/' },
+      { id: 'my-evaluations', label: 'My Evaluations', href: '/mod-ledger/evaluations' },
+      { id: 'official', label: 'Official', href: '/mod-ledger/evaluations#official' },
       {
         id: 'moderation',
         label: 'Moderation',
@@ -51,7 +52,18 @@ export const SUITE_NAV: SuiteNavApp[] = [
     label: 'Navicharts',
     href: '/navicharts/',
     status: 'available',
-    sections: [{ id: 'library', label: 'My Star Charts', href: '/navicharts/' }],
+    sections: [
+      { id: 'mine', label: 'Mine', href: '/navicharts/' },
+      { id: 'official', label: 'Official', href: '/navicharts/#official' },
+      { id: 'guild', label: 'Guild', href: '/navicharts/#guild' },
+      { id: 'bookmarked', label: 'Bookmarked', href: '/navicharts/#bookmarked' },
+      {
+        id: 'moderation',
+        label: 'All Shared',
+        href: '/navicharts/#moderation',
+        roles: ['admin', 'mod'],
+      },
+    ],
   },
   {
     id: 'nightwatcher',
