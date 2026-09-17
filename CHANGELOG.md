@@ -9,6 +9,19 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.16.1] — 2026-09-17
+
+### Changed
+- `SUITE_NAV`: Mod Ledger's `evaluations` entry splits into `my-evaluations`
+  and `protocols` (its `EvaluationsPage` already stacked these as two
+  collections; they're now real, separately-addressable destinations).
+  Navicharts' single `library` entry splits into `mine`, `curated`, `guild`,
+  `bookmarked`, and `moderation` (renamed from the app's internal "All
+  Shared" label, for naming parity with Mod Ledger's identically-gated,
+  identically-purposed entry — both are "admin/mod browses every user's
+  shared content"). No `NavBar`/`NavMenu`/`MobileNavPanel` code changes —
+  content-only manifest update.
+
 ## [0.16.0] — 2026-09-17
 
 ### Changed
@@ -127,7 +140,8 @@ Input, Select, Card, Badge, Modal, Loader), `AuthProvider` / `useAuth`
 with transparent 401 refresh, shared CSS tokens and chamfered-box
 primitives. Pre-changelog; consult `git log` for finer detail.
 
-[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.1...HEAD
+[0.16.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...v0.16.0
 [0.10.4]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.1...v0.10.4
 [0.6.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.3.1...v0.6.1
