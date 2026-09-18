@@ -39,7 +39,13 @@
   display: flex;
   align-items: center;
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+  /* medium (500), not bold (700) - mod-ledger-ui's own leftover global
+     `a { font-weight: 500 }` rule (predating its adoption of this
+     component) was overriding this class's inherited value there, and
+     that lighter look was the one the suite standardized on. Making it
+     deliberate here means every consumer renders it the same way without
+     depending on any one app's stray CSS to get there. */
+  font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   font-family: var(--font-heading);
 }
