@@ -9,6 +9,17 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.16.3] — 2026-09-18
+
+### Changed
+- `TopBar`'s `.logo` font-weight: `var(--font-weight-bold)` (700) →
+  `var(--font-weight-medium)` (500). Found via a cross-app font audit that
+  mod-ledger-ui's NavBar logo was rendering at 500 (not the intended 700)
+  because of a leftover global `a { font-weight: 500 }` rule in that app
+  predating its adoption of this component — the suite standardized on
+  that lighter look deliberately here, rather than leaving it dependent on
+  one consumer's stray CSS.
+
 ## [0.16.2] — 2026-09-17
 
 ### Added
