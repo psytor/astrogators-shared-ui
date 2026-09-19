@@ -9,6 +9,20 @@ imprecise.
 
 ## [Unreleased]
 
+### Added
+- Test suite (`npm test`, vitest, `tests/`): 53 tests over `authedFetch`
+  (token injection, proactive + reactive refresh, concurrent-refresh dedupe,
+  refresh-failure handling, the 502/503/504 + thrown-fetch retry policy and
+  its idempotency rules), `ApiClient` error parsing, `formatTime` /
+  `formatAllyCode`, and `SUITE_NAV` manifest integrity.
+- `prepublishOnly` script: `npm publish` now runs type-check + tests first, so
+  a failing test blocks a release.
+
+### Changed
+- Dev toolchain: `vite` `^8.0.9` → `^8.3.0` (8.0.0–8.0.15 carries a
+  high-severity advisory; dev-server only, nothing in `dist/`). Library
+  output is unchanged apart from bundler codegen (CSS byte-identical).
+
 ## [0.16.3] — 2026-09-18
 
 ### Changed

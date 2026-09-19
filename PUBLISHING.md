@@ -21,11 +21,16 @@ GitHub Packages step despite the repo being hosted on GitHub.
 npm install
 ```
 
-### 2. Build
+### 2. Test and build
 
 ```bash
+npm test
 npm run build
 ```
+
+`npm publish` also runs type-check + tests itself (`prepublishOnly`), so a
+failing test blocks the release even if this step is skipped. It does **not**
+build — that rule below still stands.
 
 **CRITICAL:** Always build before publishing. `dist/` is gitignored but is
 the only thing shipped (`files: ["dist"]` in `package.json`), so skipping
