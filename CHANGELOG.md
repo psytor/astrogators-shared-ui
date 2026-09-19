@@ -22,6 +22,8 @@ imprecise.
 - Dev toolchain: `vite` `^8.0.9` → `^8.3.0` (8.0.0–8.0.15 carries a
   high-severity advisory; dev-server only, nothing in `dist/`). Library
   output is unchanged apart from bundler codegen (CSS byte-identical).
+  Transitive dev deps patched via `npm audit fix` (`brace-expansion`,
+  `fast-uri`; lockfile only) — `npm audit` now reports 0 vulnerabilities.
 
 ## [0.16.3] — 2026-09-18
 
