@@ -14,9 +14,12 @@ no router, and no `index.html` runtime here.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
-see `../CLAUDE.md`. Current version is 0.16.0 — `NavBar` was rewritten to be
-built from one manifest (`SUITE_NAV`) instead of per-app props, so the bar is
-identical in every consumer; every app must bump to 0.16.0+ together.
+see `../CLAUDE.md`. As of 0.16.0, `NavBar` was rewritten to be built from one
+manifest (`SUITE_NAV`) instead of per-app props, so the bar is identical in
+every consumer; every app must bump to 0.16.0+ together. Current published
+version is 0.16.3 — see `CHANGELOG.md` for what shipped since 0.16.0 (don't
+hardcode a version number in this file; check `package.json` or the
+changelog instead).
 
 ## Common commands
 

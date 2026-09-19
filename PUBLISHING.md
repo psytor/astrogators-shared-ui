@@ -57,4 +57,6 @@ npm publish
 ### 6. Update consumers
 
 Bump `astrogators-shared-ui` in each consumer's `package.json`
-(`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`) and reinstall.
+(`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`, `navicharts-ui`) and
+reinstall. Bump all four together — never leave one consumer on a different
+version than the rest.
