@@ -9,6 +9,16 @@ imprecise.
 
 ## [Unreleased]
 
+### Fixed
+- `MobileNavPanel` now traps keyboard focus while open. It presented itself as
+  a modal dialog (`role="dialog" aria-modal="true"`) and handled Escape and
+  scroll-lock, but Tab / Shift+Tab could walk out of the panel into the page
+  hidden behind its backdrop — forward Tab escaped after the last link, and
+  Shift+Tab escaped on the very first press (focus starts on the panel
+  container, which is not itself a tab stop). Tab and Shift+Tab now wrap
+  within the panel. Verified in a real Chromium against the actual `NavBar`
+  at phone width, before and after.
+
 ## [0.16.3] — 2026-09-18
 
 ### Changed
