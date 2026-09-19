@@ -52,11 +52,16 @@ skipping the build re-publishes stale code. The flow is:
 
 1. Edit `src/` (Claude)
 2. `npm run build` (Claude)
-3. `npm version patch|minor|major` — bumps `package.json` (Claude)
-4. `npm login` + `npm publish` against npmjs.org — **must be run by the
-   user**; publishing requires interactive npm auth (OTP / browser SSO) that
-   Claude cannot complete
-5. Bump the version in each consumer's `package.json` and reinstall
+3. `npm version patch|minor|major --no-git-tag-version` — bumps
+   `package.json` (Claude). No git tag yet: it would land on a branch commit
+   that a squash-merge discards. Merge the release PR to `main` first.
+4. `npm login` + `npm publish` against npmjs.org, from `main` after the merge
+   — **must be run by the user**; publishing requires interactive npm auth
+   (OTP / browser SSO) that Claude cannot complete
+5. `git tag -a vX.Y.Z` on `main`'s merge commit and push it, only after the
+   publish succeeded (Claude) — the changelog's compare links point at these
+   tags
+6. Bump the version in each consumer's `package.json` and reinstall
 
 ## Architecture
 
