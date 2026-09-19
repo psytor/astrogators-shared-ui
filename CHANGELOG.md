@@ -9,6 +9,34 @@ imprecise.
 
 ## [Unreleased]
 
+## [0.16.4] — 2026-09-19
+
+### Added
+- Test suite (`npm test`, vitest, `tests/`): 53 tests over `authedFetch`
+  (token injection, proactive + reactive refresh, concurrent-refresh dedupe,
+  refresh-failure handling, the 502/503/504 + thrown-fetch retry policy and
+  its idempotency rules), `ApiClient` error parsing, `formatTime` /
+  `formatAllyCode`, and `SUITE_NAV` manifest integrity.
+- `prepublishOnly` script: `npm publish` now runs type-check + tests first, so
+  a failing test blocks a release.
+
+### Changed
+- Dev toolchain: `vite` `^8.0.9` → `^8.3.0` (8.0.0–8.0.15 carries a
+  high-severity advisory; dev-server only, nothing in `dist/`). Library
+  output is unchanged apart from bundler codegen (CSS byte-identical).
+  Transitive dev deps patched via `npm audit fix` (`brace-expansion`,
+  `fast-uri`; lockfile only) — `npm audit` now reports 0 vulnerabilities.
+
+### Fixed
+- `MobileNavPanel` now traps keyboard focus while open. It presented itself as
+  a modal dialog (`role="dialog" aria-modal="true"`) and handled Escape and
+  scroll-lock, but Tab / Shift+Tab could walk out of the panel into the page
+  hidden behind its backdrop — forward Tab escaped after the last link, and
+  Shift+Tab escaped on the very first press (focus starts on the panel
+  container, which is not itself a tab stop). Tab and Shift+Tab now wrap
+  within the panel. Verified in a real Chromium against the actual `NavBar`
+  at phone width, before and after.
+
 ## [0.16.3] — 2026-09-18
 
 ### Changed
@@ -179,7 +207,9 @@ Input, Select, Card, Badge, Modal, Loader), `AuthProvider` / `useAuth`
 with transparent 401 refresh, shared CSS tokens and chamfered-box
 primitives. Pre-changelog; consult `git log` for finer detail.
 
-[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.2...HEAD
+[Unreleased]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.4...HEAD
+[0.16.4]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.3...v0.16.4
+[0.16.3]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.2...v0.16.3
 [0.16.2]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.1...v0.16.2
 [0.16.1]: https://github.com/psytor/astrogators-shared-ui/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/psytor/astrogators-shared-ui/compare/v0.10.4...v0.16.0

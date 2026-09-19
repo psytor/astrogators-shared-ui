@@ -14,9 +14,11 @@ no router, and no `index.html` runtime here.
 
 For workspace-level context (submodule layout, shared infra, the
 `SERVICE_PREFIX` convention that consumers must reach via `VITE_API_BASE_URL`),
-see `../CLAUDE.md`. Current version is 0.16.0 — `NavBar` was rewritten to be
-built from one manifest (`SUITE_NAV`) instead of per-app props, so the bar is
-identical in every consumer; every app must bump to 0.16.0+ together.
+see `../CLAUDE.md`. As of 0.16.0, `NavBar` was rewritten to be built from one
+manifest (`SUITE_NAV`) instead of per-app props, so the bar is identical in
+every consumer; every app must bump to 0.16.0+ together. The current version
+is in `package.json`; `CHANGELOG.md` lists what shipped in each release (no
+version number is hardcoded here, so this file doesn't go stale on a bump).
 
 ## Common commands
 
@@ -24,11 +26,21 @@ identical in every consumer; every app must bump to 0.16.0+ together.
 npm install            # one-time / after dep changes
 npm run build          # tsc && vite build → dist/  (REQUIRED before publish)
 npm run type-check     # tsc --noEmit
+npm test               # vitest run — tests/*.test.ts
 ```
 
-There is no test runner, no linter, and no `dev` server worth running — `vite`
-in lib mode has no entry HTML. Iterate by `npm run build` here and reinstalling
-in a consumer (or `npm link`).
+Tests (`tests/`, vitest, node environment, no DOM) cover the logic that fails
+silently if broken: `authedFetch`'s refresh/dedupe/retry policy, `ApiClient`
+error parsing, the time/ally-code formatters, and `SUITE_NAV` manifest
+integrity. They do **not** cover rendering or layout — anything visual
+(chamfered `Card`, `NavBar` at phone width) still needs a real browser check.
+`npm publish` runs `prepublishOnly` (type-check + tests) automatically, so a
+failing test blocks a release; it does not run the build (see the publish
+flow below).
+
+There is no linter and no `dev` server worth running — `vite` in lib mode has
+no entry HTML. Iterate by `npm run build` here and reinstalling in a consumer
+(or `npm link`).
 
 Node is pinned to 24.x via `.nvmrc` and `engines`.
 

@@ -6,6 +6,9 @@ import { AccountCluster } from './AccountCluster';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './MobileNavPanel.module.css';
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export interface MobileNavPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -64,6 +67,34 @@ export const MobileNavPanel: React.FC<MobileNavPanelProps> = ({
       if (event.key === 'Escape') {
         onClose();
         returnFocusRef.current?.focus();
+        return;
+      }
+
+      // Focus trap: this panel is portalled to document.body and presents
+      // itself as a modal dialog, so Tab must not be able to walk focus out
+      // into whatever's behind the (visually hidden, but still-in-the-DOM)
+      // backdrop. Re-queried on every Tab press rather than cached, since
+      // the accordion's expand/collapse changes which links exist.
+      if (event.key === 'Tab') {
+        const focusable = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+        if (!focusable || focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        // Focus starts on (and returns to, after a click on blank space) the
+        // panel container itself, which isn't one of `focusable`. From there
+        // Shift+Tab would walk straight out to the page behind, so treat
+        // "on the container, or somewhere outside it" as an edge too.
+        const active = document.activeElement;
+        const onContainerOrOutside = active === panelRef.current || !panelRef.current?.contains(active);
+
+        if (event.shiftKey && (active === first || onContainerOrOutside)) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && (active === last || onContainerOrOutside)) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
     document.addEventListener('keydown', handleKeyDown);

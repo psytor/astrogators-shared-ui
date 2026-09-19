@@ -1,8 +1,9 @@
 # astrogators-shared-ui
 
 Shared React components, auth, and API client for the Astrogator's Table
-frontends (`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`). Published
-to the public npm registry as `astrogators-shared-ui` (unscoped).
+frontends (`astrogators-hub`, `mod-ledger-ui`, `nightwatcher-ui`,
+`navicharts-ui`). Published to the public npm registry as
+`astrogators-shared-ui` (unscoped).
 
 > The git repo lives under `psytor/astrogators-shared-ui` on GitHub, but the
 > package itself is published to **npmjs.org**, not GitHub Packages. No
@@ -177,9 +178,14 @@ const result = await apiClient.post('/api/v1/mod-ledger/evaluate/123456789', {
 
 The client:
 - injects the access token into `Authorization`
-- on `401`, transparently refreshes via `/api/v1/auth/refresh-token` and
-  retries the original request once
+- proactively refreshes before a request goes out if the access token is
+  expired or expiring within 30s (decoded client-side), and reactively on a
+  `401` from the resource server — both via `/api/v1/auth/refresh`, retrying
+  the original request once
 - calls `onUnauthorized` if refresh fails
+- retries a `502`/`503`/`504` response (idempotent methods only) or a thrown
+  `fetch` (any method, since nothing reached the server) a couple of times
+  with a short backoff, to ride out a backend container swap mid-deploy
 
 Endpoints are written **without** the service prefix — the prefix lives in
 the configured `baseURL`.
@@ -254,6 +260,7 @@ Sci-fi cut-corner effect, available as utility classes or via `Card`:
 npm install
 npm run build        # tsc && vite build → dist/
 npm run type-check   # tsc --noEmit
+npm test             # vitest run — logic tests in tests/ (not visual)
 ```
 
 There is no `dev` server worth running (this is a library, not an app).
