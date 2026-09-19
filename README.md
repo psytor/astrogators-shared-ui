@@ -260,6 +260,7 @@ Sci-fi cut-corner effect, available as utility classes or via `Card`:
 npm install
 npm run build        # tsc && vite build → dist/
 npm run type-check   # tsc --noEmit
+npm test             # vitest run — logic tests in tests/ (not visual)
 ```
 
 There is no `dev` server worth running (this is a library, not an app).
